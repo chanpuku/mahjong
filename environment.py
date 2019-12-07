@@ -26,7 +26,7 @@ class environment:
         self.kyoku=self.taku.kyoku
         self.honba=self.taku.honba
         self.kyotaku=self.taku.kyotaku
-        self.dora_hyoji=self.taku.dora_hyoji
+        self.dora_hyoji=self.taku.yama.dora_hyoji
         self.dora=self.taku.dora
         self.parent=self.taku.parent
         self.sutehai=[self.janshi[i].sutehai for i in range(self.numOfPeople)]

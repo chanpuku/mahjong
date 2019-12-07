@@ -307,7 +307,7 @@ class draw_controll:
 			self.screen.blit(self.font4.render('＞', True, (0,0,0)), (895,120))
 			pygame.draw.rect(self.screen, (0, 0, 255), self.button_undo)
 			self.screen.blit(self.font4.render('＜', True, (0,0,0)), (765,120))
-		if self.taku.state=='game_end':
+		if self.taku.state=='finished':
 			pygame.draw.rect(self.screen, (0, 0, 255), self.button_new_game)
 			self.screen.blit(self.font3.render('new-game', True, (0,0,0)), (780,270))
 		self.screen.blit(self.font3.render(state, True, (0,0,0)), (770,70))
@@ -324,7 +324,7 @@ class draw_controll:
 				return 'run'
 			if self.button_undo.collidepoint(pos):
 				return 'undo'
-		if self.taku.state=='game_end':
+		if self.taku.state=='finished':
 			if self.button_new_game.collidepoint(pos):
 				return 'new_game'
 		return 0

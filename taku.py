@@ -36,7 +36,6 @@ class taku:
 			self.janshi[i].getting_haipai()
 	def set_new_dora(self):
 		n=self.yama.dora_hyouji[-1]
-		self.dora_hyouji.append(n)
 		self.environment.update_dora()
 	def set_environment_state(self):
 		pass
@@ -44,8 +43,8 @@ class taku:
 	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
 				ti_tya=0,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
 				saifu=False,tenho=False,kaeshi_point=None,uma=None):
-		#self.state=[game_start,geme_end,kyoku_start,kyoku_end,tsumo_turn_start,action,dahai_check,tsumo_turn_end,finished
-		self.state='kyoku_start'
+		#self.state=[geme_end,kyoku_start,kyoku_end,tsumo_turn_start,action,dahai_check,tsumo_turn_end,finished
+		
 		self.numOfPeople=numOfPeople
 		self.numOfAkadora=numOfAkadora
 		self.numOfSet=numOfSet
@@ -88,43 +87,25 @@ class taku:
 		self.paifu['game_info']['oyaken_kamityadori']=self.oyaken_kamityadori
 
 
-		#drawでエラーが出ないために初期化してる、結局するから処理自体はしてもしなくても一緒<-gamestartの方をなくした
+		#drawでエラーが出ないために初期化してる、結局するから処理自体はしてもしなくても一緒<-state=game_startの方をなくした
+		
 		#game初め
+		self.game_start()
+		
+		#局初め
+		#self.dora=[]
+		#self.set_yama(self.numOfPeople,self.numOfAkadora,self.numOfSet,self.torikiri,self.hanahai)
+		self.kyoku_start()
+	def game_start(self):
 		self.tokuten=tokuten.tokuten(self.numOfPeople,self.mochiten,self.zerotobi,self.tsumibo_point)
-		self.parent=0
 		self.kyoku=1
 		self.honba=0
 		self.kyotaku=0
 		self.chicha=random.randint(0,self.numOfPeople-1)
-		self.environment=environment.environment(self)
-		#局初め
-		self.dora=[]
-		self.set_yama(self.numOfPeople,self.numOfAkadora,self.numOfSet,self.torikiri,self.hanahai)
-		
-		#for jan in self.janshi:
-			#jan.get_haipai(self.yama)
-		
-		self.set_haipai(self.numOfPeople,self.yama.yama,self.parent)
-		self.turn = self.parent
-		self.ryukyoku=False
-		self.kamitya_hora_id=-1
-		self.dahai=0
-		self.tsumo=0
-		self.furo_happen=-1#泣かれたひとのid
-		self.furo_id=-1#泣いた人のid
-		self.furo_type=None #[tsumo,ron,pon,ti,kan]
-		self.hora_list=[]#[han,hu,hora_id,hoju_id]
-		
-	def game_start(self):
-		#self.next_kyoku()
-		"""
-		self.tokuten=tokuten.tokuten(self.numOfPeople,self.mochiten,self.zerotobi,self.tsumibo_point)
 		self.parent=self.chicha
-		self.kyoku=1
-		self.honba=0
-		self.kyotaku=0
 		self.state='kyoku_start'
-		"""
+		self.environment=environment.environment(self)
+		
 	def game_end(self):
 		if self.kyotaku>0:
 			top=self.tokuten.top()
@@ -150,19 +131,19 @@ class taku:
 			self.janshi[i].kyoku_start(wind)
 
 		self.set_yama(self.numOfPeople,self.numOfAkadora,self.numOfSet,self.torikiri,self.hanahai)
-		"""
-		for jan in self.janshi:
-			jan.get_haipai(self.yama)
-		"""
 		self.set_haipai(self.numOfPeople,self.yama.yama,self.parent)
 		self.turn = self.parent
 		self.ryukyoku=False
 		self.state='tsumo_turn_start'
+
+		#全体を通して使う
 		self.furo_happen=-1#泣かれたひとのid
 		self.furo_id=-1#泣いた人のid
 		self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
 		self.hora_list=[]#[han,hu,hora_id,hoju_id]
-
+		self.kamitya_hora_id=-1
+		self.dahai=-1
+		self.tsumo=0
 		#paifu
 		self.temp_paifu={'info':{},'moda':[],'end':{}}
 		self.temp_paifu['info']={'kyoku':self.kyoku,'honba':self.honba,'kyotaku':self.kyotaku,'oya':self.parent}
@@ -336,9 +317,7 @@ class taku:
 			self.state='tsumo_turn_start'
 
 	def controll(self):
-		if self.state=='game_start':
-			self.game_start()
-		elif self.state=='game_end':
+		if self.state=='game_end':
 			self.game_end()
 		elif self.state=='kyoku_start':
 			self.kyoku_start()

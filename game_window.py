@@ -20,11 +20,13 @@ def main():
 
 	#init
 	#卓の設定
-	numOfPeople=3
+	numOfPeople=2
 	numOfAkadora=1
-	numOfSet=3
+	numOfSet=2
 
-	import prototype
+	#視覚用
+	sleep_time=0
+	#import prototype
 	#agent=prototype.agent()
 	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
 	draw_controll=draw.draw_controll(taku,screen)
@@ -32,12 +34,12 @@ def main():
 	run=True
 	# ゲームループ
 	while True:
-		#視覚用
-		#time.sleep(0.001)
+		
 		if run:
 			taku.controll()
 		draw_controll.update_display()
 		pygame.display.update()# 画面を更新
+		
 		# イベント処理
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:  # 終了イベント
@@ -53,8 +55,10 @@ def main():
 			elif state=='undo':
 				taku.undo()
 			elif state=='new_game':
-				taku.state='game_start'
-
+				taku.__init__(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
+				state='run'
+		#視覚用
+		time.sleep(sleep_time)
 main()
 
 
