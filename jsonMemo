@@ -1,0 +1,44 @@
+{
+    "game_info":{
+        numOfPeople
+        numOfAkadora
+        numOfSet
+        numOfKyoku=None
+        numOfTonpu=2,
+        mochiten=25000,
+        tenpai_rentyan=True,
+		ti_tya=0,
+        daburon=True,
+        tobi_end=True,
+        zerotobi=False,
+        torikiri=False,
+        hanahai=0,
+        tsumibo_point=300,
+        oyaken_kamityadori=False
+    }
+    
+    "kyoku_info":[
+        "kyoku":{
+            "info":{
+                "kyoku":
+                "honba":
+                "tsumibo":
+                "oya":
+                "haipai":[]
+                "dora_hyoji":
+                "score":[]
+            },
+            "moda:[],
+            "end:{
+                "frag":  #agari,ryukyoku,ex_ryukyoku
+                "renchan": Bool
+                "score":[]
+            }
+        }
+
+    ]
+    "endo_info":{
+        score:[]
+    }
+
+}
