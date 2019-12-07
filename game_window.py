@@ -20,9 +20,9 @@ def main():
 
 	#init
 	#卓の設定
-	numOfPeople=2
+	numOfPeople=4
 	numOfAkadora=1
-	numOfSet=2
+	numOfSet=4
 
 	#視覚用
 	sleep_time=0

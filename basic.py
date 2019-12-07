@@ -29,7 +29,7 @@ class pai:
 		if dora:
 			self.name=self.name+'+'
 		self.dora=dora
-		self.image=pygame.image.load('image/'+self.name+'.jpg').convert() 
+		#self.image=pygame.image.load('image/'+self.name+'.jpg').convert() 
 		
 	def next(self):
 		if self.typ=='z':

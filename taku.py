@@ -42,7 +42,7 @@ class taku:
 
 	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
 				ti_tya=0,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
-				saifu=False,tenho=False,kaeshi_point=None,uma=None):
+				tenho=False,kaeshi_point=None,uma=None,visual=True,saifu=False,):
 		#self.state=[geme_end,kyoku_start,kyoku_end,tsumo_turn_start,action,dahai_check,tsumo_turn_end,finished
 		
 		self.numOfPeople=numOfPeople
@@ -93,8 +93,6 @@ class taku:
 		self.game_start()
 		
 		#局初め
-		#self.dora=[]
-		#self.set_yama(self.numOfPeople,self.numOfAkadora,self.numOfSet,self.torikiri,self.hanahai)
 		self.kyoku_start()
 	def game_start(self):
 		self.tokuten=tokuten.tokuten(self.numOfPeople,self.mochiten,self.zerotobi,self.tsumibo_point)
@@ -215,7 +213,7 @@ class taku:
 		else:
 			self.state='game_end'
 		#paifu
-		self.temp_paifu['end']['score']=self.tokuten.tokuten
+		self.temp_paifu['end']['score']=copy.copy(self.tokuten.tokuten)
 		self.paifu['kyoku'].append(self.temp_paifu)
 	def tsumo_turn_start(self,kan=False):
 		if self.lastOfYama==0:

@@ -34,7 +34,19 @@ class draw_controll:
 			self.naki=False
 			self.naki_id=0
 			self.back_color_of_pai=(255,190,0)
-
+			self.pai_image=self.get_pai_image()
+	def get_pai_image(self):
+		l=[]
+		for i in range(37):
+			if i<9:name='m'+str(i+1)
+			elif i<18:name='p'+str(i-8)
+			elif i<27:name='s'+str(i-17)
+			elif i<34:name='z'+str(i-26)
+			elif i==34:name='m5+'
+			elif i==35:name='p5+'
+			elif i==36:name='s5+'
+			l.append(pygame.image.load('image/'+name+'.jpg').convert() )
+		return l
 	def draw_yama(self,yama):
 		def point(i):
 			x=950
@@ -50,7 +62,7 @@ class draw_controll:
 		self.screen.fill((0,180,0),(950,0,450,750))
 		length=len(yama.yama)
 		for i in range(length):
-			img=yama.yama[i].image
+			img=self.pai_image[yama.yama[i].correct_id]
 			img=pygame.transform.rotate(img,-90)
 			self.screen.blit(img, point(i))
 		#終了場所
@@ -88,7 +100,7 @@ class draw_controll:
 		x,y,vx,vy=point_and_direction(janshi_id)
 		for i in range(len(tehai)):
 			pai=tehai[i]
-			img=pai.image
+			img=self.pai_image[pai.correct_id]
 			img=pygame.transform.rotate(img,90*janshi_id)
 			vvx,vvy=x+vx*i,y+vy*i
 			if self.taku.state=='action' and i==len(tehai)-1:
@@ -130,7 +142,7 @@ class draw_controll:
 					pai=last_pai[k]
 					rot_id=janshi_id
 					k=k-1
-				img=pai.image
+				img=self.pai_image[pai.correct_id]
 				img=pygame.transform.rotate(img,90*rot_id)
 				self.screen.blit(img,(x,y))
 				if pai in self.taku.dora:
@@ -191,7 +203,7 @@ class draw_controll:
 		x,y,vx,vy,vvx,vvy=point_and_direction(janshi_id)
 		for i in range(len(sutehai)):
 			pai=sutehai[i]
-			img=pygame.transform.rotate(pai.image,90*janshi_id)
+			img=pygame.transform.rotate(self.pai_image[pai.correct_id],90*janshi_id)
 			self.screen.blit(img,(x+vx*(i%6)+vvx*(i//6),y+vy*(i%6)+vvy*(i//6)))
 			if pai in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
@@ -252,7 +264,7 @@ class draw_controll:
 			pygame.draw.rect(self.screen, (0,0,0),rect,2)
 		pre_x=vx
 		for num in taku.yama.dora_hyouji:
-			img=pygame.transform.smoothscale(taku.yama.yama[num].image,(20,30))
+			img=pygame.transform.smoothscale(self.pai_image[taku.yama.yama[num].correct_id],(20,30))
 			pre_x=pre_x+20
 			self.screen.blit(img, (pre_x,vy))
 		#点数
@@ -331,9 +343,13 @@ class draw_controll:
 	def draw_kyoku_end(self):
 		pass
 	def debug(self):
-		
-		string='environment: '+str(self.taku.environment.state)
-		self.screen.blit(self.font1.render(string, True, (0,0,0)), (750,500))
+		l=[]
+		s1='furo_id '+str(self.taku.furo_id)
+		s2='furo_type '+str(self.taku.furo_type)
+		l.append(s1)
+		l.append(s2)
+		for i in range(len(l)):
+			self.screen.blit(self.font1.render(l[i], True, (0,0,0)), (750,500+20*i))
 		pass
 	def update_display(self):
 		self.draw_controller()
