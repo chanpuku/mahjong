@@ -10,6 +10,7 @@ class draw_controll:
 			self.font2 = pygame.font.Font(fo, 20)
 			self.font3=pygame.font.Font(fo, 30)
 			self.font4=pygame.font.Font(fo, 40)
+			self.font5=pygame.font.Font(fo, 50)
 			tumibo=pygame.transform.smoothscale(pygame.image.load('image/tennbou-100.jpg').convert(),(10,100))
 			self.tumibo=pygame.transform.rotate(tumibo,90)
 			richibo=pygame.transform.smoothscale(pygame.image.load('image/tennbou-1000.jpg').convert(),(10,100))
@@ -227,10 +228,6 @@ class draw_controll:
 		surface.fill((255,100,71))
 		self.screen.blit(surface,(x,y))
 		self.screen.blit(pygame.transform.rotate(self.font4.render(state, True, (0,0,0)),90*self.taku.ti_tya), (x+dx,y+dy))
-	def draw_naki(self,janshi_id):
-		def point(i):
-			return 1
-		pass
 	def draw_center_info(self,taku):
 		center_infomation=(270,270,210,210)
 		self.screen.fill((100,216,255),center_infomation)
@@ -339,21 +336,54 @@ class draw_controll:
 		if self.taku.state=='finished':
 			if self.button_new_game.collidepoint(pos):
 				return 'new_game'
-		return 0
+		return 'run'
 	def draw_kyoku_end(self):
 		pass
-	def debug(self):
+	def draw_furo(self):
+		def point(i):
+			if i==0:
+				return (315,660)
+			elif i==1:
+				return (660,315)
+			elif i==2:
+				return (315,50)
+			else:
+				return (50,315)
+		if self.taku.furo_happen:
+			typ=self.taku.furo_type
+			if not typ=='ron':
+				if typ=='pon':s='ポ ン'
+				elif typ=='chi':s='チ ー'
+				elif typ=='tsumo':s='ツ モ'
+				else:s='カ ン'
+				x,y=point(self.taku.furo_id)
+				text=self.font4.render(s, True, (0,0,0))
+				text=pygame.transform.rotate(text,90*self.taku.furo_id)
+				self.screen.blit(text, (x,y))
+			else:
+				s='ロ　ン'
+				for t in self.taku.hora_list:
+					x,y=point(t[0])
+					text=self.font4.render(s, True, (0,0,0))
+					text=pygame.transform.rotate(text,90*t[0])
+					self.screen.blit(text, (x,y))
+	def debug(self,x=None):
 		l=[]
 		s1='furo_id '+str(self.taku.furo_id)
-		s2='furo_type '+str(self.taku.furo_type)
+		s2='furo_happen '+str(self.taku.furo_happen)
+		s3='furo_type '+str(self.taku.furo_type)
+		s4=str(x)
 		l.append(s1)
 		l.append(s2)
+		l.append(s3)
+		l.append(s4)
 		for i in range(len(l)):
 			self.screen.blit(self.font1.render(l[i], True, (0,0,0)), (750,500+20*i))
 		pass
 	def update_display(self):
 		self.draw_controller()
 		self.draw_oya_mark()
+		
 		"""
 		if taku.state='kyoku_end':
 			self.draw_kyoku_end()
@@ -363,10 +393,8 @@ class draw_controll:
 		for i in range(self.taku.numOfPeople):
 			self.draw_tehai(self.taku.janshi[i].tehai,i,self.taku.janshi[i].furo_mentsu)
 			self.draw_kawa(self.taku.janshi[i].sutehai,i)
-		"""
-		if self.taku.naki_id > -1:
-			self.draw_naki(self.taku.naki_id)
-		"""
+		
+		self.draw_furo()
 		
 		#debug
 		self.debug()

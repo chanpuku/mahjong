@@ -20,9 +20,9 @@ def main():
 
 	#init
 	#卓の設定
-	numOfPeople=4
+	numOfPeople=2
 	numOfAkadora=1
-	numOfSet=4
+	numOfSet=2
 
 	#視覚用
 	sleep_time=0
@@ -31,14 +31,17 @@ def main():
 	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
 	draw_controll=draw.draw_controll(taku,screen)
 	pygame.display.update()# 画面を更新
-	run=True
+	state='run'
 	# ゲームループ
 	while True:
-		
-		if run:
+		if state=='draw_kyoku_end':
+			draw_controll.draw_kyoku_end()
+			state='run'
+		elif state=='run':
 			taku.controll()
+			if taku.furo_happen:
+				state='draw_kyoku_end'
 		draw_controll.update_display()
-		pygame.display.update()# 画面を更新
 		
 		# イベント処理
 		for event in pygame.event.get():
@@ -46,19 +49,22 @@ def main():
 				pygame.quit()
 				return
 				#sys.exit()
-		if event.type == pygame.MOUSEBUTTONDOWN:
-			state=draw_controll.button_controll(event.pos)
-			if state=='run':
-				run=True
-			elif state=='stop':
-				run=False
-			elif state=='undo':
-				taku.undo()
-			elif state=='new_game':
-				taku.__init__(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
-				state='run'
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				state=draw_controll.button_controll(event.pos)
+				draw_controll.debug(x=len(pygame.event.get()))
+				
+				if state=='run':
+					pass
+				elif state=='stop':
+					pass
+				elif state=='undo':
+					taku.undo()
+				elif state=='new_game':
+					taku.__init__(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
+					state='run'
 		#視覚用
 		time.sleep(sleep_time)
+		pygame.display.update()# 画面を更新
 main()
 
 

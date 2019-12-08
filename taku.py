@@ -135,10 +135,11 @@ class taku:
 		self.state='tsumo_turn_start'
 
 		#全体を通して使う
-		self.furo_happen=-1#泣かれたひとのid
+		self.furo_happen=False
+		self.ed_furo_id=-1#泣かれたひとのid
 		self.furo_id=-1#泣いた人のid
 		self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
-		self.hora_list=[]#[han,hu,hora_id,hoju_id]
+		self.hora_list=[]#[hora_id,hoju_id,han,fu]
 		self.kamitya_hora_id=-1
 		self.dahai=-1
 		self.tsumo=0
@@ -226,32 +227,37 @@ class taku:
 			self.lastOfYama=self.lastOfYama-1
 			self.state='tsumo_action'
 	def tsumo_action(self):
-		if self.furo_happen>-1:
+		self.furo_happen=False
+		self.ed_furo_id=-1#泣かれたひとのid
+		self.furo_id=-1#泣いた人のid
+		self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
+		if self.furo_happen:
 			if self.furo_type=='kakan' or self.furo_type=='ankan' or self.furo_type =='daiminkan':
 				typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo)
-			else:
+			else:#’pon','chi'
 				typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo,furo=True)
-			self.furo_happen=-1#泣かれたひとのid
-			self.furo_id=-1#泣いた人のid
-			self.furo_type=None #[tsumo,ron,pon,ti,ankan,kakan,daiminkan]
+			
 		else:
 			typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo)
 		if typ=='tsumo':
-			#self.furo=-1#泣かれたひとのid
-			#self.furo_id=-1#泣いた人のid
-			self.furo_type='tsumo' #[tsumo,ron,pon,ti,kan]
+			self.furo_happen=True#泣かれたひとのid
+			self.furo_id=self.turn
+			self.ed_furo_id=-1#泣かれたひとのid
+			self.furo_type='tsumo'
 			self.kamitya_hora_id=self.turn
 			self.hora_list.append((self.turn,-1,result[0],result[1]))
 			self.state='kyoku_end'
 		elif typ=='ankan':
-			#self.furo=-1#泣かれたひとのid
-			#self.furo_id=-1#泣いた人のid
-			self.furo_type='ankan' #[tsumo,ron,pon,ti,kan]
+			self.furo_happen=True#泣かれたひとのid
+			self.furo_id=self.turn
+			self.ed_furo_id=-1#泣かれたひとのid
+			self.furo_type='ankan' 
 			self.state='tsumo_turn_start'
 		elif typ=='kakan':
-			#self.furo=-1#泣かれたひとのid
-			#self.furo_id=-1#泣いた人のid
-			self.furo_type='kakan' #[tsumo,ron,pon,ti,kan]
+			self.furo_happen=True#泣かれたひとのid
+			self.furo_id=self.turn
+			self.ed_furo_id=-1#泣かれたひとのid
+			self.furo_type='kakan' 
 			self.dahai=result
 			self.state='dahai_check'
 		else:
@@ -286,28 +292,36 @@ class taku:
 					player_id=i 
 					li=l
 		if happen_typ=='ron':
+			self.furo_happen=True#泣かれたひとのid
+			#self.furo_id=player_id
+			self.ed_furo_id=self.turn#泣かれたひとのid
+			self.furo_type='ron' 
 			self.state='kyoku_end'
 		elif happen_typ=='':
 			self.state='tsumo_turn_end'
 		else:
 			self.janshi[player_id].furo(happen_typ,self.dahai,self.turn,li)
 			self.dahai.ed_furo=True
+			self.furo_happen=True#泣かれたひとのid
 			self.furo_id=player_id
+			self.ed_furo_id=self.turn#泣かれたひとのid
 			self.furo_type=happen_typ
 			self.set_environment_state()
 			self.state='tsumo_turn_end'
 	def tsumo_turn_end(self):
 		if self.furo_type=='pon'or self.furo_type=='chi' or self.furo_type=='daiminkan':
 			self.turn=self.furo_id
-			self.furo_is_happen=-1#泣かれたひとのid
+			self.furo_happen=False
+			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_id=-1#泣いた人のid
-			self.furo_type=None #[tsumo,ron,pon,ti,kan]
+			self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
 			self.state='tsumo_action'
 		elif self.furo_type=='kakan':#チャンカンチェックが入る
 			self.turn=self.furo_id
-			self.furo_is_happen=-1#泣かれたひとのid
+			self.furo_happen=False
+			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_id=-1#泣いた人のid
-			self.furo_type=None #[tsumo,ron,pon,ti,kan]
+			self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
 			self.state='tsumo_turn_start'
 		#それ以外のfuroはここにこない
 		else:
