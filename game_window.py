@@ -26,23 +26,16 @@ def main():
 
 	#視覚用
 	sleep_time=0
+	sleep_time_kyoku_end=3
 	#import prototype
 	#agent=prototype.agent()
 	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
 	draw_controll=draw.draw_controll(taku,screen)
 	pygame.display.update()# 画面を更新
 	state='run'
+	kyoku_end_draw_first=True
 	# ゲームループ
 	while True:
-		if state=='draw_kyoku_end':
-			draw_controll.draw_kyoku_end()
-			state='run'
-		elif state=='run':
-			taku.controll()
-			if taku.furo_happen:
-				state='draw_kyoku_end'
-		draw_controll.update_display()
-		
 		# イベント処理
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:  # 終了イベント
@@ -62,6 +55,27 @@ def main():
 				elif state=='new_game':
 					taku.__init__(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
 					state='run'
+		
+		if not kyoku_end_draw_first:
+			time.sleep(sleep_time_kyoku_end)
+		if state=='run':
+			if taku.state=='finished':
+				#draw_controll.draw_game_end()
+				#time.sleep(sleep_time_kyoku_end)
+				state=='stop'
+			elif taku.state=='kyoku_end' and kyoku_end_draw_first:
+				taku.controll()
+				draw_controll.draw_kyoku_end()
+				kyoku_end_draw_first=False
+			else:
+				taku.controll()
+				draw_controll.update_display()
+				kyoku_end_draw_first=True
+
+		#常にする
+		draw_controll.draw_controller()
+		
+		
 		#視覚用
 		time.sleep(sleep_time)
 		pygame.display.update()# 画面を更新

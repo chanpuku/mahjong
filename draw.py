@@ -337,18 +337,43 @@ class draw_controll:
 			if self.button_new_game.collidepoint(pos):
 				return 'new_game'
 		return 'run'
-	def draw_kyoku_end(self):
-		pass
+	def draw_kyoku_end(self):#自由に書き換えて良い
+		
+		def point(i):
+			if i==0:
+				return (120,200)
+			elif i==1:
+				return (200,55)
+			elif i==2:
+				return (55,-5)
+			else:
+				return (-5,120)
+		x,y=270,270
+		cur_tokuten=self.taku.paifu['kyoku'][-1]['end']['score']
+		pre_tokuten=self.taku.paifu['kyoku'][-1]['info']['score']
+		for i in range(self.taku.numOfPeople):
+			
+			d=cur_tokuten[i]-pre_tokuten[i]
+			if not d==0:
+				if d>0:
+					text=self.font2.render(str('+')+str(d), True, pygame.Color('blue'))
+				else:
+					text=self.font2.render(str(d), True, pygame.Color('red'))
+				vx,vy=point(i)
+				text=pygame.transform.rotate(text,90*i)
+				self.screen.blit(text, (x+vx,y+vy))
+		#self.draw_furo()
+
 	def draw_furo(self):
 		def point(i):
 			if i==0:
-				return (315,660)
+				return (315,640)
 			elif i==1:
-				return (660,315)
+				return (640,315)
 			elif i==2:
-				return (315,50)
+				return (315,60)
 			else:
-				return (50,315)
+				return (60,315)
 		if self.taku.furo_happen:
 			typ=self.taku.furo_type
 			if not typ=='ron':
@@ -357,14 +382,14 @@ class draw_controll:
 				elif typ=='tsumo':s='ツ モ'
 				else:s='カ ン'
 				x,y=point(self.taku.furo_id)
-				text=self.font4.render(s, True, (0,0,0))
+				text=self.font5.render(s, True, (0,0,0))
 				text=pygame.transform.rotate(text,90*self.taku.furo_id)
 				self.screen.blit(text, (x,y))
 			else:
-				s='ロ　ン'
+				s='ロ ン'
 				for t in self.taku.hora_list:
 					x,y=point(t[0])
-					text=self.font4.render(s, True, (0,0,0))
+					text=self.font5.render(s, True, (0,0,0))
 					text=pygame.transform.rotate(text,90*t[0])
 					self.screen.blit(text, (x,y))
 	def debug(self,x=None):
@@ -383,16 +408,15 @@ class draw_controll:
 	def update_display(self):
 		self.draw_controller()
 		self.draw_oya_mark()
-		
-		"""
-		if taku.state='kyoku_end':
-			self.draw_kyoku_end()
-		"""
-		self.draw_yama(self.taku.yama)
 		self.draw_center_info(self.taku)
+		
+		#'takuのkyoku_end'の直後
+		#if self.taku.state=='kyoku_start':self.draw_kyoku_end()
+
+		self.draw_yama(self.taku.yama)
 		for i in range(self.taku.numOfPeople):
 			self.draw_tehai(self.taku.janshi[i].tehai,i,self.taku.janshi[i].furo_mentsu)
-			self.draw_kawa(self.taku.janshi[i].sutehai,i)
+			self.draw_kawa(self.taku.janshi[i].sutehai,i)#はみ出すかもなのでdraw_tehaiとの順番大事
 		
 		self.draw_furo()
 		
