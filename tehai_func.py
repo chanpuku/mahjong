@@ -280,5 +280,31 @@ def make_state(string):
             state[sp+int(string[i])-1]=state[sp+int(string[i])-1]+1
     return state
 
+"""
+#Shanten_ippanに対して全てのsub_stateでTEST
+dic={}
+l=[set()for i in range(15)]
+l[0]={tuple([0]*9)}
+for i in range(1,10):
+	for j in range(14):
+		k=14-j
+		for p in range(1,5):
+			if k-p<0:break
+			for t in l[k-p]:
+				li=list(t)
+				li[i-1]=p
+				l[k].add(tuple(li))
 
-
+times=0
+for i in range(15):
+	for t in l[i]:
+		mat=np.zeros(34)
+		times+=1
+		for k in range(9):
+			mat[k]=t[k]
+		try:
+			Shanten_ippan(mat)
+		except :
+			print(mat)
+		if times%3000==2999:print('times =%d'%times)
+"""
