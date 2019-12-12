@@ -473,14 +473,13 @@ class draw_controll:
 	def debug(self,x=None):
 		self.screen.fill(pygame.Color('black'),(750,450,200,300))#下300,上400はcontroller
 		l=[]
-		s1='furo_id '+str(self.taku.furo_id)
-		s2='furo_happen '+str(self.taku.furo_happen)
-		s3='furo_type '+str(self.taku.furo_type)
-		s4=str(x)
+		s1='environment'
+		s2=str(self.taku.environment.state[18:27])
+		s3=str(self.taku.environment.state[27:34])
+		
 		l.append(s1)
 		l.append(s2)
 		l.append(s3)
-		l.append(s4)
 		for i in range(len(l)):
 			self.screen.blit(self.font1.render(l[i], True, pygame.Color('white')), (750,500+20*i))
 		

@@ -135,7 +135,6 @@ class taku:
 		self.kan_times=0
 		self.environment.kyoku_start()
 		self.state='tsumo_turn_start'
-
 		#全体を通して使う
 		self.furo_happen=False
 		self.ed_furo_id=-1#泣かれたひとのid
