@@ -48,6 +48,10 @@ class draw_controll:
 			elif i==36:name='s5+'
 			l.append(pygame.image.load('image/'+name+'.jpg').convert() )
 		return l
+	def screen_initialize(self):
+		self.screen.fill((0,180,0),(0,0,750,750))# 画面を緑色で塗りつぶす
+		self.screen.fill((255,255,0),(750,0,200,750))# 山との間を塗りつぶす
+		self.screen.fill((0,180,0),(950,0,450,750))# 山部分を塗りつぶす
 	def draw_yama(self,yama):
 		def point(i):
 			x=950
@@ -62,8 +66,11 @@ class draw_controll:
 				return(x+20+80*3+30*3+40*(i%2),y-15*(i%34))
 		self.screen.fill((0,180,0),(950,0,450,750))
 		length=len(yama.yama)
-		for i in range(length):
-			img=self.pai_image[yama.yama[i].correct_id]
+		kan_times=self.taku.kan_times
+		for i in range(length+kan_times):
+			if i<kan_times:
+				continue
+			img=self.pai_image[yama.yama[i-kan_times].correct_id]
 			img=pygame.transform.rotate(img,-90)
 			self.screen.blit(img, point(i))
 		#終了場所
@@ -71,7 +78,7 @@ class draw_controll:
 		x,y=point(last_pai)
 		self.screen.fill((255,0,190),(x,y+29,40,10))
 		#表示牌
-		for i in yama.dora_hyouji:
+		for i in yama.dora_hyoji:
 			surface=pygame.transform.rotate(pygame.Surface((29,40)),-90)
 			surface.fill((255,50,255))
 			surface.set_alpha(self.alpha)
@@ -104,14 +111,14 @@ class draw_controll:
 			img=self.pai_image[pai.correct_id]
 			img=pygame.transform.rotate(img,90*janshi_id)
 			vvx,vvy=x+vx*i,y+vy*i
-			if self.taku.state=='action' and i==len(tehai)-1:
-				vvx,vvy=vvx+vx,vvy+vy
+			if  janshi_id==self.taku.turn and  i==len(tehai)-1 and self.taku.state=='tsumo_action' and not self.taku.furo_type=='pon' and not self.taku.furo_type=='chi':
+				vvx,vvy=vvx+vx/2,vvy+vy/2
 			self.screen.blit(img,(vvx,vvy))
 			if pai in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
-				self.screen.blit(surface,(x+vx*i,y+vy*i))
+				self.screen.blit(surface,(vvx,vvy))
 			
 		#furoは左から
 		def furo_point_and_direction(janshi_id):
@@ -160,10 +167,74 @@ class draw_controll:
 					y+=dy
 			return(x,y)
 		
-		def draw_ankan(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy):
-			return (furox,furoy)
+		def draw_ankan(last_pai,janshi_id,screen,furox,furoy):
+			def direction(i):
+				if i==0:
+					return(-29,0)
+				if i==1:
+					return(0,29)
+				if i==2:
+					return(29,0)
+				if i==3:
+					return(0,-29)
+			dx,dy,=direction(janshi_id)
+			x,y=furox,furoy
+			for i in range(4):
+				if i==1 or i==2:
+					pai=last_pai[i]
+					img=self.pai_image[pai.correct_id]
+					img=pygame.transform.rotate(img,90*janshi_id)
+					self.screen.blit(img,(x,y))
+					if pai in self.taku.dora:
+						surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
+						surface.fill((255,255,0))
+						surface.set_alpha(self.alpha)
+						screen.blit(surface,(x,y))
+				else:
+					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
+					surface.fill((self.back_color_of_pai,0))
+					screen.blit(surface,(x,y))
+				x+=dx
+				y+=dy
+			return(x,y)
+		
+			
 		def draw_daiminkan(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy):
-			return (furox,furoy)
+			_,_,dx,dy,rotx,roty,undox,undoy=furo_point_and_direction(janshi_id)
+			x,y=furox,furoy
+			if ed_player_id<janshi_id:
+				d=ed_player_id-janshi_id+3
+			else:d=ed_player_id-janshi_id-1
+			if d==2:d=3
+			k=1
+			for i in range(4):
+				if i==d:
+					x-=dx
+					y-=dy
+					x+=rotx
+					y+=roty
+					pai=furo_ed_pai
+					rot_id=(janshi_id+1)%4
+				else:
+					pai=last_pai[k]
+					rot_id=janshi_id
+					k=k-1
+				img=self.pai_image[pai.correct_id]
+				img=pygame.transform.rotate(img,90*rot_id)
+				self.screen.blit(img,(x,y))
+				if pai in self.taku.dora:
+					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
+					surface.fill((255,255,0))
+					surface.set_alpha(self.alpha)
+					screen.blit(surface,(x,y))
+				
+				if i==d:
+					x+=undox
+					y+=undoy
+				else:
+					x+=dx
+					y+=dy
+			return(x,y)
 		def draw_kakan(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy):
 			return (furox,furoy)
 		furox,furoy,_,_,_,_,_,_=furo_point_and_direction(janshi_id)
@@ -172,10 +243,12 @@ class draw_controll:
 			if kind=='chi' or kind=='pon':
 				furox,furoy=draw_chi_or_pon(furo_ed_pai,ed_player_id,last_pai,janshi_id,self.screen,furox,furoy)
 			elif kind=='ankan':
-				furox,furoy=draw_ankan(furo_ed_pai,ed_player_id,last_pai,janshi_id,self.screen,furox,furoy)
+				#全てlast_pai
+				furox,furoy=draw_ankan(last_pai,janshi_id,self.screen,furox,furoy)
 			elif kind=='daiminkan':
 				furox,furoy=draw_daiminkan(furo_ed_pai,ed_player_id,last_pai,janshi_id,self.screen,furox,furoy)
 			elif kind=='kakan':
+				#last_paiの最後が加えたpai
 				furox,furoy=draw_kakan(furo_ed_pai,ed_player_id,last_pai,janshi_id,self.screen,furox,furoy)
 		
 		
@@ -211,7 +284,12 @@ class draw_controll:
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
 				self.screen.blit(surface,(x+vx*(i%6)+vvx*(i//6),y+vy*(i%6)+vvy*(i//6)))
-	def draw_oya_mark(self):
+			if not pai.ed_furo_id==-1:
+				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
+				surface.fill(pygame.Color('black'))
+				surface.set_alpha(self.alpha)
+				self.screen.blit(surface,(x+vx*(i%6)+vvx*(i//6),y+vy*(i%6)+vvy*(i//6)))
+	def draw_chicha_mark(self):
 		def point_and_direction(i):
 			if i==0:
 				return (590,610,10,0)
@@ -222,12 +300,12 @@ class draw_controll:
 			else: 
 				return (100,590,0,10)
 		l=['東','南','西','北']
-		x,y,dx,dy=point_and_direction(self.taku.ti_tya)
+		x,y,dx,dy=point_and_direction(self.taku.chicha)
 		state=l[(self.taku.kyoku-1)//self.taku.numOfKyoku]
-		surface=pygame.transform.rotate(pygame.Surface((60,40)),90*self.taku.ti_tya)
+		surface=pygame.transform.rotate(pygame.Surface((60,40)),90*self.taku.chicha)
 		surface.fill((255,100,71))
 		self.screen.blit(surface,(x,y))
-		self.screen.blit(pygame.transform.rotate(self.font4.render(state, True, (0,0,0)),90*self.taku.ti_tya), (x+dx,y+dy))
+		self.screen.blit(pygame.transform.rotate(self.font4.render(state, True, (0,0,0)),90*self.taku.chicha), (x+dx,y+dy))
 	def draw_center_info(self,taku):
 		center_infomation=(270,270,210,210)
 		self.screen.fill((100,216,255),center_infomation)
@@ -260,7 +338,7 @@ class draw_controll:
 			rect=pygame.Rect(pre_x,vy,20,30)
 			pygame.draw.rect(self.screen, (0,0,0),rect,2)
 		pre_x=vx
-		for num in taku.yama.dora_hyouji:
+		for num in taku.yama.dora_hyoji:
 			img=pygame.transform.smoothscale(self.pai_image[taku.yama.yama[num].correct_id],(20,30))
 			pre_x=pre_x+20
 			self.screen.blit(img, (pre_x,vy))
@@ -305,7 +383,7 @@ class draw_controll:
 				self.screen.blit(richibo,(x+vx,y+vy))
 	def draw_controller(self):
 		#塗り潰し
-		self.screen.fill((255,255,0),(750,50,200,700))
+		self.screen.fill((255,255,0),(750,50,200,400))#上400,下350はdebug
 		if self.run:
 			state= 'run'
 			pygame.draw.rect(self.screen, (255, 0, 0), self.button_stop)
@@ -341,13 +419,13 @@ class draw_controll:
 		
 		def point(i):
 			if i==0:
-				return (120,200)
+				return (90,200)
 			elif i==1:
 				return (200,55)
 			elif i==2:
 				return (55,-5)
 			else:
-				return (-5,120)
+				return (-5,90)
 		x,y=270,270
 		cur_tokuten=self.taku.paifu['kyoku'][-1]['end']['score']
 		pre_tokuten=self.taku.paifu['kyoku'][-1]['info']['score']
@@ -393,6 +471,7 @@ class draw_controll:
 					text=pygame.transform.rotate(text,90*t[0])
 					self.screen.blit(text, (x,y))
 	def debug(self,x=None):
+		self.screen.fill(pygame.Color('black'),(750,450,200,300))#下300,上400はcontroller
 		l=[]
 		s1='furo_id '+str(self.taku.furo_id)
 		s2='furo_happen '+str(self.taku.furo_happen)
@@ -403,11 +482,11 @@ class draw_controll:
 		l.append(s3)
 		l.append(s4)
 		for i in range(len(l)):
-			self.screen.blit(self.font1.render(l[i], True, (0,0,0)), (750,500+20*i))
-		pass
+			self.screen.blit(self.font1.render(l[i], True, pygame.Color('white')), (750,500+20*i))
+		
 	def update_display(self):
 		self.draw_controller()
-		self.draw_oya_mark()
+		self.draw_chicha_mark()
 		self.draw_center_info(self.taku)
 		
 		#'takuのkyoku_end'の直後

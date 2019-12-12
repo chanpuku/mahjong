@@ -7,7 +7,7 @@
         numOfTonpu=2,
         mochiten=25000,
         tenpai_rentyan=True,
-		ti_tya=0,
+		chicha=0,
         daburon=True,
         tobi_end=True,
         zerotobi=False,

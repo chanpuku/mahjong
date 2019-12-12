@@ -22,7 +22,7 @@ class environment:
         self.KIND_OF_PAI_NOMAL=37
         self.state=np.zeros(self.KIND_OF_PAI_NOMAL)
     def kyoku_start(self):
-        self.field_wind=self.taku.field_wind
+        #self.field_wind=self.taku.field_wind
         self.kyoku=self.taku.kyoku
         self.honba=self.taku.honba
         self.kyotaku=self.taku.kyotaku
@@ -30,18 +30,17 @@ class environment:
         self.dora=self.taku.dora
         self.parent=self.taku.parent
         self.sutehai=[self.janshi[i].sutehai for i in range(self.numOfPeople)]
+        self.all_order=[]
         self.furo_mentsu=[self.janshi[i].furo_mentsu for i in range(self.numOfPeople)]
         self.state=np.zeros(self.KIND_OF_PAI_NOMAL)
-        
     def update_dora(self):
         self.state[self.dora_hyoji[-1]]+=1
     
-    #mutableだから必要ない気がする
-    def update_dahai(self,player_id):
-        self.janshi[player_id].sutehai=self.taku.janshi[player_id]
     
-    #mutableだから必要ない気がする
-    def update_furo(self):
-        pass
+	#sutehai_all
+    def update_dahai(self,player_id,dahai_id):
+        self.all_order.append(('d',player_id,dahai_id))
+    def update_furo(self,player_id,furo_type,furo_ed_pai,reveal_pai_list):
+        self.all_order.append(('f',player_id,furo_type,furo_ed_pai,reveal_pai_list))
             
 

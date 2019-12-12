@@ -25,11 +25,11 @@ def main():
 	numOfSet=2
 
 	#視覚用
-	sleep_time=0
+	sleep_time=1
 	sleep_time_kyoku_end=3
 	#import prototype
 	#agent=prototype.agent()
-	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
+	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=2,numOfSet=numOfSet,torikiri=True,saifu=True)
 	draw_controll=draw.draw_controll(taku,screen)
 	pygame.display.update()# 画面を更新
 	state='run'
@@ -54,8 +54,10 @@ def main():
 					taku.undo()
 				elif state=='new_game':
 					taku.__init__(numOfPeople,numOfAkadora,numOfTonpu=1,numOfSet=numOfSet,torikiri=True,saifu=True)
+					draw_controll.screen_initialize()
 					state='run'
-		
+		#常にする
+		draw_controll.draw_controller()
 		if not kyoku_end_draw_first:
 			time.sleep(sleep_time_kyoku_end)
 		if state=='run':
@@ -72,8 +74,7 @@ def main():
 				draw_controll.update_display()
 				kyoku_end_draw_first=True
 
-		#常にする
-		draw_controll.draw_controller()
+		
 		
 		
 		#視覚用

@@ -14,6 +14,8 @@ class taku:
 			self.yama=basic.yama(numOfPeople,numOfAkadora,pointOfDora)
 		else:
 			self.yama=basic.yama(numOfSet,numOfAkadora,pointOfDora)
+		#debug
+		#self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29])
 
 		#カンによるlastOfYamaの変化はカンの方で
 		if numOfPeople==1:
@@ -32,16 +34,13 @@ class taku:
 			j=(j+1)%numOfPeople
 		for i in range(numOfPeople):
 			self.janshi[i].tehai=l[i]
-			self.janshi[i].dora_hyoji=[self.yama.yama[self.yama.dora_hyouji[0]]]
+			self.janshi[i].dora_hyoji=[self.yama.yama[self.yama.dora_hyoji[0]]]
 			self.janshi[i].getting_haipai()
 	def set_new_dora(self):
-		n=self.yama.dora_hyouji[-1]
 		self.environment.update_dora()
-	def set_environment_state(self):
-		pass
 
 	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
-				ti_tya=0,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
+				chicha=None,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
 				tenho=False,kaeshi_point=None,uma=None,visual=True,saifu=False,):
 		#self.state=[geme_end,kyoku_start,kyoku_end,tsumo_turn_start,action,dahai_check,tsumo_turn_end,finished
 		
@@ -54,7 +53,7 @@ class taku:
 		self.numOfTonpu=numOfTonpu
 		self.tenpai_rentyan=tenpai_rentyan
 		self.daburon=daburon
-		self.ti_tya=ti_tya
+		self.chicha=chicha
 		self.tobi_end=tobi_end
 		self.mochiten=mochiten
 		self.tsumibo_point=tsumibo_point
@@ -63,7 +62,7 @@ class taku:
 		self.tenho=tenho
 		self.kaeshi_point=kaeshi_point
 		self.uma=uma
-		
+		self.can_chi=self.numOfPeople==4
 
 		self.saifu=saifu
 		self.janshi=[basic.janshi(self.mochiten) for i in range(numOfPeople)]
@@ -79,7 +78,7 @@ class taku:
 		self.paifu['game_info']['numOfTonpu']=self.numOfTonpu
 		self.paifu['game_info']['tenpai_rentyan']=self.tenpai_rentyan
 		self.paifu['game_info']['daburon']=self.daburon
-		self.paifu['game_info']['ti_tya']=self.ti_tya
+		self.paifu['game_info']['chicha']=self.chicha
 		self.paifu['game_info']['tobi_end']=self.tobi_end
 		self.paifu['game_info']['mochiten']=self.mochiten
 		self.paifu['game_info']['tsumibo_point']=self.tsumibo_point
@@ -99,7 +98,8 @@ class taku:
 		self.kyoku=1
 		self.honba=0
 		self.kyotaku=0
-		self.chicha=random.randint(0,self.numOfPeople-1)
+		if self.chicha==None:
+			self.chicha=random.randint(0,self.numOfPeople-1)
 		self.parent=self.chicha
 		self.state='kyoku_start'
 		self.environment=environment.environment(self)
@@ -132,6 +132,8 @@ class taku:
 		self.set_haipai(self.numOfPeople,self.yama.yama,self.parent)
 		self.turn = self.parent
 		self.ryukyoku=False
+		self.kan_times=0
+		self.environment.kyoku_start()
 		self.state='tsumo_turn_start'
 
 		#全体を通して使う
@@ -146,7 +148,7 @@ class taku:
 		#paifu
 		self.temp_paifu={'info':{},'moda':[],'end':{}}
 		self.temp_paifu['info']={'kyoku':self.kyoku,'honba':self.honba,'kyotaku':self.kyotaku,'oya':self.parent}
-		self.temp_paifu['info']['dora_hyoji']=self.yama.yama[self.yama.dora_hyouji[0]].name
+		self.temp_paifu['info']['dora_hyoji']=self.yama.yama[self.yama.dora_hyoji[0]].name
 		self.temp_paifu['info']['haipai']=[[pai.name for pai in self.janshi[i].tehai] for i in range(self.numOfPeople)]
 		self.temp_paifu['info']['score']=copy.copy(self.tokuten.tokuten)
 		self.temp_paifu['end']['renchan']=True
@@ -222,23 +224,24 @@ class taku:
 			self.state='kyoku_end'
 		else:
 			kan= self.furo_type =='ankan' or self.furo_type =='kakan' or self.furo_type =='daiminkan'
+			if kan:self.kan_times+=1
 			jan=self.janshi[self.turn]
 			self.tsumo=jan.tsumo(self.yama.yama,kan=kan)
 			self.lastOfYama=self.lastOfYama-1
 			self.state='tsumo_action'
 	def tsumo_action(self):
+		
+		if self.furo_happen:
+			if self.furo_type=='kakan' or self.furo_type=='ankan' or self.furo_type =='daiminkan':
+				typ,result=self.janshi[self.turn].action(self.environment,tsumo_pai=self.tsumo)
+			else:#’pon','chi'
+				typ,result=self.janshi[self.turn].action(self.environment,tsumo_pai=self.tsumo,furo=True)
+		else:
+			typ,result=self.janshi[self.turn].action(self.environment,tsumo_pai=self.tsumo)
 		self.furo_happen=False
 		self.ed_furo_id=-1#泣かれたひとのid
 		self.furo_id=-1#泣いた人のid
 		self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
-		if self.furo_happen:
-			if self.furo_type=='kakan' or self.furo_type=='ankan' or self.furo_type =='daiminkan':
-				typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo)
-			else:#’pon','chi'
-				typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo,furo=True)
-			
-		else:
-			typ,result=self.janshi[self.turn].action(tsumo_pai=self.tsumo)
 		if typ=='tsumo':
 			self.furo_happen=True#泣かれたひとのid
 			self.furo_id=self.turn
@@ -252,26 +255,32 @@ class taku:
 			self.furo_id=self.turn
 			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_type='ankan' 
+			#self.kan_times+=1
+			self.janshi[self.turn].furo(typ,self.dahai,-1,[])
+			self.environment.update_furo(typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
 			self.state='tsumo_turn_start'
 		elif typ=='kakan':
 			self.furo_happen=True#泣かれたひとのid
 			self.furo_id=self.turn
 			self.ed_furo_id=-1#泣かれたひとのid
-			self.furo_type='kakan' 
+			self.furo_type='kakan'
+			self.janshi[self.turn].furo(typ,self.dahai,-1,[])
+			self.environment.update_furo(self.turn,typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
 			self.dahai=result
+			#self.kan_times+=1
 			self.state='dahai_check'
 		else:
 			self.dahai=result
+			self.environment.update_dahai(self.turn,result.correct_id)
 			self.state='dahai_check'
 		
-		self.set_environment_state()
 	def dahai_check(self):
 		happen_typ=''
 		player_id=-1
 		li=[]
 		for i in range(self.numOfPeople):
 			if i==self.turn:continue
-			b,typ,l=self.janshi[i].furo_check(self.dahai)
+			b,typ,l=self.janshi[i].furo_check(self.dahai,self.can_chi and i==(self.turn+1)%self.numOfPeople,self.environment)
 			if b:
 				if typ=='ron':
 					happen_typ='ron'
@@ -296,32 +305,36 @@ class taku:
 			#self.furo_id=player_id
 			self.ed_furo_id=self.turn#泣かれたひとのid
 			self.furo_type='ron' 
+			self.dahai.ed_furo_id=player_id
+			self.dahai.ed_furo_type=happen_typ
 			self.state='kyoku_end'
 		elif happen_typ=='':
 			self.state='tsumo_turn_end'
-		else:
+		else:	
 			self.janshi[player_id].furo(happen_typ,self.dahai,self.turn,li)
-			self.dahai.ed_furo=True
-			self.furo_happen=True#泣かれたひとのid
+			self.furo_happen=True
 			self.furo_id=player_id
 			self.ed_furo_id=self.turn#泣かれたひとのid
 			self.furo_type=happen_typ
-			self.set_environment_state()
+			self.dahai.ed_furo_id=player_id
+			self.dahai.ed_furo_type=happen_typ
+			self.environment.update_furo(self.furo_id,happen_typ,self.dahai.correct_id,self.janshi[player_id].furo_mentsu[-1][-1])
 			self.state='tsumo_turn_end'
 	def tsumo_turn_end(self):
-		if self.furo_type=='pon'or self.furo_type=='chi' or self.furo_type=='daiminkan':
+		if self.furo_type=='pon'or self.furo_type=='chi':
 			self.turn=self.furo_id
-			self.furo_happen=False
-			self.ed_furo_id=-1#泣かれたひとのid
-			self.furo_id=-1#泣いた人のid
-			self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
 			self.state='tsumo_action'
+		elif self.furo_type=='daiminkan':
+			self.turn=self.furo_id
+			self.state='tsumo_turn_start'
 		elif self.furo_type=='kakan':#チャンカンチェックが入る
 			self.turn=self.furo_id
+			"""多分いらないしコメントにしてる
 			self.furo_happen=False
 			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_id=-1#泣いた人のid
 			self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
+			"""
 			self.state='tsumo_turn_start'
 		#それ以外のfuroはここにこない
 		else:

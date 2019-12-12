@@ -50,6 +50,7 @@ def ukeire(state,num_of_furoMentsu=0):
     l=[]
     cur=Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
     for i in range(S):
+        if state[i]==4:continue
         state[i]+=1
         if Shanten(state,num_of_furoMentsu=num_of_furoMentsu)<cur:
             l.append(i)
@@ -104,8 +105,27 @@ def can_chi(state,id):
         return state[id-2]*state[id-1]>0 or state[id-1]*state[id+1]>0
     else:
         return  state[id-2]*state[id-1]>0 or state[id-1]*state[id+1]>0 or state[id+1]*state[id+2]>0
-    
 
+#chiできる前提
+def can_chi_list(state,id):
+	ans=set()
+	#字牌は考えない
+	#retrun はソート順
+	if id%9==0:
+		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
+	elif id%9==8:
+		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
+	elif id%9==1:
+		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
+		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
+	elif id%9==7:
+		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
+		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
+	else:
+		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
+		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
+		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
+	return ans
 
         
 """
