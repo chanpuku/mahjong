@@ -78,7 +78,7 @@ class draw_controll:
 		x,y=point(last_pai)
 		self.screen.fill((255,0,190),(x,y+29,40,10))
 		#表示牌
-		for i in yama.dora_hyoji:
+		for i in yama.pointOfDoraHyoji:
 			surface=pygame.transform.rotate(pygame.Surface((29,40)),-90)
 			surface.fill((255,50,255))
 			surface.set_alpha(self.alpha)
@@ -114,7 +114,7 @@ class draw_controll:
 			if  janshi_id==self.taku.turn and  i==len(tehai)-1 and self.taku.state=='tsumo_action' and not self.taku.furo_type=='pon' and not self.taku.furo_type=='chi':
 				vvx,vvy=vvx+vx/2,vvy+vy/2
 			self.screen.blit(img,(vvx,vvy))
-			if pai in self.taku.dora:
+			if pai.id in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
@@ -153,7 +153,7 @@ class draw_controll:
 				img=self.pai_image[pai.correct_id]
 				img=pygame.transform.rotate(img,90*rot_id)
 				self.screen.blit(img,(x,y))
-				if pai in self.taku.dora:
+				if pai.id in self.taku.dora:
 					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
 					surface.fill((255,255,0))
 					surface.set_alpha(self.alpha)
@@ -185,7 +185,7 @@ class draw_controll:
 					img=self.pai_image[pai.correct_id]
 					img=pygame.transform.rotate(img,90*janshi_id)
 					self.screen.blit(img,(x,y))
-					if pai in self.taku.dora:
+					if pai.id in self.taku.dora:
 						surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 						surface.fill((255,255,0))
 						surface.set_alpha(self.alpha)
@@ -222,7 +222,7 @@ class draw_controll:
 				img=self.pai_image[pai.correct_id]
 				img=pygame.transform.rotate(img,90*rot_id)
 				self.screen.blit(img,(x,y))
-				if pai in self.taku.dora:
+				if pai.id in self.taku.dora:
 					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
 					surface.fill((255,255,0))
 					surface.set_alpha(self.alpha)
@@ -279,7 +279,7 @@ class draw_controll:
 			pai=sutehai[i]
 			img=pygame.transform.rotate(self.pai_image[pai.correct_id],90*janshi_id)
 			self.screen.blit(img,(x+vx*(i%6)+vvx*(i//6),y+vy*(i%6)+vvy*(i//6)))
-			if pai in self.taku.dora:
+			if pai.id in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
@@ -338,7 +338,7 @@ class draw_controll:
 			rect=pygame.Rect(pre_x,vy,20,30)
 			pygame.draw.rect(self.screen, (0,0,0),rect,2)
 		pre_x=vx
-		for num in taku.yama.dora_hyoji:
+		for num in taku.yama.pointOfDoraHyoji:
 			img=pygame.transform.smoothscale(self.pai_image[taku.yama.yama[num].correct_id],(20,30))
 			pre_x=pre_x+20
 			self.screen.blit(img, (pre_x,vy))

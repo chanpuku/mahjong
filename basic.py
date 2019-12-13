@@ -73,15 +73,13 @@ class pai:
 	
 class yama:
 	#一局ごとにあたらしいのが作られてる
-	def __init__(self,numOfPeople,numOfAkadora,pointOfDora,jihai=True):
+	def __init__(self,numOfPeople,numOfAkadora,pointOfDoraHyoji,jihai=True):
 		self.numOfPeople=numOfPeople
 		self.numOfAkadora=numOfAkadora
 		self.jihai=jihai
-		self.pointOfDora=pointOfDora
+		self.pointOfDoraHyoji=pointOfDoraHyoji
 		typ_list=['m','p','s','z']
 		self.yama=[]
-		self.dora_hyoji=[self.pointOfDora]
-		self.dora=[]
 		if self.numOfPeople==4:
 			for typ in typ_list:
 				for num in range(1,10):
@@ -100,7 +98,6 @@ class yama:
 					for i in range(4):
 						if num==5 and (not typ=='z') and i<numOfAkadora:
 							self.yama.append(pai(typ,num,dora=True,aka=True))
-							self.dora.append(pai(typ,num,aka=True))
 						else :self.yama.append(pai(typ,num))
 					if num==7 and typ=='z':
 						break
@@ -113,13 +110,14 @@ class yama:
 					for i in range(4):
 						if num==5 and (not typ=='z') and i<self.numOfAkadora:
 							self.yama.append(pai(typ,num,dora=True))
-							self.dora.append(pai(typ,num))
 						else :self.yama.append(pai(typ,num))
 					if num==7 and typ=='z':
 						break
 		random.shuffle(self.yama)
-		for num in self.dora_hyoji:
-			self.dora.append(self.yama[num].next())
+		self.dora_hyoji=[self.yama[i].id for i in self.pointOfDoraHyoji]
+		self.dora=[self.yama[i].next().id for i in self.pointOfDoraHyoji]
+		if numOfAkadora:
+			self.dora+=[34,35,36]
 
 	def pop(self):
 		return self.yama.pop()
@@ -157,7 +155,6 @@ class janshi:
 	def kyoku_start(self,wind):
 		self.tehai=[]
 		self.furo_mentsu=[]
-		self.tehai_state=[]
 		self.dora_hyoji=[]
 		self.sutehai=[]
 		self.tenpai=False
@@ -179,28 +176,34 @@ class janshi:
 			l.append(self.tehai.pop())
 		self.furo_mentsu.append(('pon',l[1],3,[l[0],l[2]]))
 		"""
-		self.tehai_state=np.zeros(KIND_OF_PAI)
+		self.tehai_state=np.zeros(KIND_OF_PAI_NOMAL)
 		for p in self.tehai:
-			self.tehai_state[p.id]+=1
-		self.make_can_furo_dic(self.tehai_state,len(self.furo_mentsu))
+			self.tehai_state[p.correct_id]+=1
+		self.make_can_furo_dic()
 		
 	def tsumo(self,yama,kan=False):
 		if kan:pai=yama.pop(0)
 		else:pai=yama.pop()
 		#なんらかの判定
 		self.tehai.append(pai)
-		self.tehai_state[pai.id]+=1
+		self.tehai_state[pai.correct_id]+=1
 
 		return pai
 	def action(self,environment,tsumo_pai=0,furo=False):
 		if  furo:
-			rd=self.dahai_choice()
-			pai=self.tehai[rd]
+			rd=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu),tsumo_pai=tsumo_pai)
+			k=0
+			pai=0
+			for i in range(len(self.tehai)):
+				if self.tehai[i].correct_id==rd:
+					k=i
+					break
+			pai=self.tehai[k]
 			self.sutehai.append(pai)
-			self.tehai_state[pai.id]-=1
-			del self.tehai[rd]
+			self.tehai_state[rd]-=1
+			del self.tehai[k]
 			self.tehai.sort()
-			self.make_can_furo_dic(self.tehai_state,len(self.furo_mentsu))
+			self.make_can_furo_dic()
 			return ('dahai',pai)
 		else:
 			tsumo,rt=self.tsumo_check(tsumo_pai)
@@ -214,33 +217,40 @@ class janshi:
 			elif ankan:
 				return('ankan',ra)
 			else:
-				rd=self.dahai_choice(tsumo_pai=tsumo_pai)
-				pai=self.tehai[rd]
+				rd=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu),tsumo_pai=tsumo_pai)
+				k=0
+				pai=0
+				for i in range(len(self.tehai)):
+					if self.tehai[i].correct_id==rd:
+						k=i
+						break
+				pai=self.tehai[k]
 				self.sutehai.append(pai)
-				self.tehai_state[pai.id]-=1
-				del self.tehai[rd]
+				self.tehai_state[rd]-=1
+				del self.tehai[k]
 				self.tehai.sort()
-				self.make_can_furo_dic(self.tehai_state,len(self.furo_mentsu))
+				self.make_can_furo_dic()
 				return ('dahai',pai)
-	def dahai_choice(self,tsumo_pai=0):
+	def dahai_choice(self,state,environment,num_of_furoMentsu,tsumo_pai=0):
 		#打牌ロジック
 		s,si,uke=10,-1,0
-		for i in range(len(self.tehai)):
-			j=self.tehai[i].id
-			self.tehai_state[j]-=1
-			a=tehai_func.Shanten(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu))
+		state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
+		for i in range(len(state)):
+			if state[i]==0:continue
+			state[i]-=1
+			a=tehai_func.Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
 			u=0
-			for k in tehai_func.ukeire(self.tehai_state):
-				u+=(4-self.tehai_state[k])
+			for k in tehai_func.ukeire(state):
+				u+=(4-state[k]-environment.state[k])
 			if a<s:
 				s,si,uke=a,i,u
 			elif a==s :
 				if u>uke:
 					s,si,uke=a,i,u
 				elif u==uke:
-					if self.tehai[si].dora:
+					if si in environment.dora:
 						s,si,uke=a,i,u
-			self.tehai_state[j]+=1
+			state[i]+=1
 		return si
 	def kakan_check(self,tusmo_pai):
 		return False,-1
@@ -255,14 +265,13 @@ class janshi:
 
 	def furo_check(self,dahai,can_chi,environment):
 		#(bool,typ,pai,さらしリスト)
+		
 		def ron_check(dahai):
 			if dahai.id in self.can_furo_dic['ron']:
 				return True
 			else:
 				return False	
-		def chi_check(dahai,cur_s,cur_u):
-			
-			
+		def chi_check(dahai,cur_s,cur_u,environment,state):
 			#(するか,typ,シャンテン数,受け入れ,さらし)
 			if not dahai.id in self.can_furo_dic['chi']:
 				return False,'chi',10,0,[]
@@ -271,20 +280,31 @@ class janshi:
 				for id1,id2 in tehai_func.can_chi_list(self.tehai_state,dahai.id):
 					self.tehai_state[id1]-=1
 					self.tehai_state[id2]-=1
+					pai_id=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu)+1)
+					self.tehai_state[pai_id]-=1
 					s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu)+1)
 					u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu)+1)
+					u=0
+					self.tehai_state[pai_id]+=1
 					self.tehai_state[id1]+=1
 					self.tehai_state[id2]+=1
-					u=0
 					for i in u_l:
-						u+=(4-environment.state[i])
-					if cur_s>s or (cur_s==s and cur_u<u) :
-						t=(id1,id2)
+						u+=(4-self.tehai_state[i]-environment.state[i])
+					if cur_s>s :
+						cur_s,cur_u,t=s,u,(id1,id2)
+					elif cur_s==s:
+						if cur_u<u:
+							cur_s,cur_u,t=s,u,(id1,id2)
+						elif cur_u==u:
+							if id1>33 or id2>33:
+								cur_s,cur_u,t=s,u,(id1,id2)
+					
 				if t:
+					#さらしリストを作る
 					l=[]
 					j=0
 					for i in range(len(self.tehai)):
-						if self.tehai[i].id==t[j]:
+						if self.tehai[i].corrct_id==t[j]:
 							l.append(i)
 							if j==0:
 								j+=1
@@ -296,28 +316,34 @@ class janshi:
 					
 			
 			
-		def pon_check(dahai,cur_s,cur_u):
+		def pon_check(dahai,cur_s,cur_u,environment,state):
 			if not dahai.id in self.can_furo_dic['pon']:
 				return False,'pon',10,0,[]
 			l=[]
 			j=0
+			#さらしリストを作る
 			for i in range(len(self.tehai)):
-				if self.tehai[i].id==dahai.id:
-					l.append(i)
+				if self.tehai[-(i+1)].id==dahai.id:
+					l.append(len(self.tehai)-(i+1))
 					j+=1
 					if j>1:break
-			self.tehai_state[dahai.id]-=2
-			s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu)+1)
-			u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu)+1)
-			self.tehai_state[dahai.id]+=2
+			l.sort()
+			state[dahai.id]-=2
+			pai_id=self.dahai_choice(state,environment,len(self.furo_mentsu)+1)
+			state[pai_id]-=1
+			s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
+			u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
 			u=0
+			state[pai_id]+=1
+			state[dahai.id]+=2
 			for i in u_l:
-				u+=(4-environment.state[i])
-			if cur_s>s or (cur_s==s and (cur_u<u or dahai.dora)):return(True,'pon',s,u,l)
+				u+=(4-self.tehai_state[i]-environment.state[i])
+			if cur_s>s or (cur_s==s and cur_u<u ):
+				return(True,'pon',s,u,l)
 			else:return (False,'pon',10,0,[])
 			
 
-		def daiminikan_check(dahai,cur_s,cur_u):
+		def daiminikan_check(dahai,cur_s,cur_u,environment,state):
 			if not dahai.id in self.can_furo_dic['daiminkan']:
 				return False,'diminkan',10,0,[]
 			#debug
@@ -329,15 +355,17 @@ class janshi:
 					l.append(i)
 					j+=1
 					if j>3:break
-			self.tehai_state[dahai.id]-=3
-			s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu)+1)
-			u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu)+1)
-			self.tehai_state[dahai.id]+=3
+			state[dahai.id]-=3
+			s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
+			u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
+			state[dahai.id]+=3
 			u=0
 			for i in u_l:
-				u+=(4-environment.state[i])
+				u+=(4-environment.state[i]-state[i])
 			if cur_s>=s and cur_u<=u :return(True,'daiminkan',s,u,l)
 			else:return (False,'daiminkan',10,0,[])
+
+		state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
 
 		if ron_check(dahai):
 			return (True,'ron',0)
@@ -346,20 +374,20 @@ class janshi:
 			cur_u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu))
 			cur_u=0
 			for i in cur_u_l:
-				cur_u+=(4-environment.state[i])
+				cur_u+=(4-environment.state[i]-state[i])
 			if can_chi:f_l=[daiminikan_check,pon_check,chi_check]
 			else:f_l=[daiminikan_check,pon_check]
 			boo,typ,shan,uke,li=False,0,10,0,[]
 			#Trueの中で最もいいやつを使う
 			for f in f_l:
-				b,t,s,u,l=f(dahai,cur_s,cur_u)
+				b,t,s,u,l=f(dahai,cur_s,cur_u,environment,state)
 				if b :
 					if shan>s or (shan==s and uke<u):
 						boo,typ,shan,uke,li=b,t,s,u,l
 			return (boo,typ,li)
 
-	def make_can_furo_dic(self,state,num_of_furoMentsu):
-		self.can_furo_dic=tehai_func.can_furo_dic(state,num_of_furoMentsu)
+	def make_can_furo_dic(self):
+		self.can_furo_dic=tehai_func.can_furo_dic(self.tehai_state,len(self.furo_mentsu))
 		furi=set()
 		for p in self.sutehai:
 			furi.add(p.id)
@@ -376,7 +404,7 @@ class janshi:
 				if self.tehai[i].id==pai.id:
 					del self.tehai[i]
 					break
-			self.tehai_state[pai.id]-=1
+			self.tehai_state[pai.correct_id]-=1
 			for i in range(len(self.furo_mentsu)):
 				if self.furo_mentsu[i][1].id==pai.id:
 					self.furo_mentsu[i][0]='kakan'
@@ -389,16 +417,16 @@ class janshi:
 			for i in range(len(self.tehai)):
 				if self.tehai[i-j].id==pai.id:
 					l.append(self.tehai[i-j])
+					self.tehai_state[self.tehai[i-j].correct_id]-=1
 					del self.tehai[i-j]
 					j+=1
-			self.tehai_state[pai.id]-=4
 			self.furo_mentsu.append((typ,pai,-1,l))
 		else:
 			l.sort()
 			self.furo_mentsu.append((typ,pai,ed_player_id,[self.tehai[i] for i in l]))
 			j=0
 			for i in l:
-				self.tehai_state[self.tehai[i-j].id]-=1
+				self.tehai_state[self.tehai[i-j].correct_id]-=1
 				del self.tehai[i-j]
 				j+=1
 	def is_tempai(self):

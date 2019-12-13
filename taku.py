@@ -8,14 +8,14 @@ import copy
 import environment
 class taku:
 	def set_yama(self,numOfPeople,numOfAkadora,numOfSet,torikiri,hanahai):
-		pointOfDora=5+hanahai
+		pointOfDoraHyoji=[5+hanahai]
 		#１人、２人麻雀用
 		if numOfSet==-1:
-			self.yama=basic.yama(numOfPeople,numOfAkadora,pointOfDora)
+			self.yama=basic.yama(numOfPeople,numOfAkadora,pointOfDoraHyoji)
 		else:
-			self.yama=basic.yama(numOfSet,numOfAkadora,pointOfDora)
+			self.yama=basic.yama(numOfSet,numOfAkadora,pointOfDoraHyoji)
 		#debug
-		#self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29])
+		self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29,31,32,31,32])
 
 		#カンによるlastOfYamaの変化はカンの方で
 		if numOfPeople==1:

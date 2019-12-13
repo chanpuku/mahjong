@@ -16,27 +16,15 @@ with open('shanten_data/shanten_key', mode='rb') as fi:
 with open('shanten_data/shanten_value', mode='rb') as fi:
     shanten_value = pickle.load(fi)
 
-"""
-シャンテン数
-"""
-def Shanten(state,num_of_furoMentsu=0):
-    shanten_k,shanten_t=10,10
-    if num_of_furoMentsu>0:
-        shanten_t=Shanten_titoi(state)
-        shanten_k=Shanten_kokushi(state)
-    #対子列挙
-    min_s=10
-    for i in range(S):
-        if state[i]>=2:
-            state[i]-=2
-            #孤立牌をカット
-            p_state = state-kanzen_koritu(state)
-            s=Shanten_ippan(p_state,num_of_furoMentsu=num_of_furoMentsu)-1
-            min_s=min(s,min_s)
-            state[i]+=2
-    s= Shanten_ippan(state-kanzen_koritu(state),num_of_furoMentsu=num_of_furoMentsu)
-    shanten_i = min(min_s, s)
-    return min(shanten_i,shanten_k,shanten_t)
+def corrct_id_state_to_id_state(correct_id_state):
+	state=correct_id_state
+	if len(state)==37:
+		ans=np.copy(state[:34])
+		ans[4]+=state[34]
+		ans[13]+=state[35]
+		ans[22]+=state[36]
+		return ans
+
 
 def vectorize_pai_list(pai_list):
     l=[0]*S
@@ -44,52 +32,93 @@ def vectorize_pai_list(pai_list):
         n=p.id
         l[n]=l[n]+1
     return l
+"""
+シャンテン数
+"""
+def Shanten(state,num_of_furoMentsu=0):
+	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	shanten_k,shanten_t=10,10
+	if num_of_furoMentsu>0:
+		shanten_t=Shanten_titoi(state)
+		shanten_k=Shanten_kokushi(state)
+	#対子列挙
+	min_s=10
+	for i in range(S):
+		if state[i]>=2:
+			state[i]-=2
+			#孤立牌をカット
+			p_state = state-kanzen_koritu(state)
+			s=Shanten_ippan(p_state,num_of_furoMentsu=num_of_furoMentsu)-1
+			min_s=min(s,min_s)
+			state[i]+=2
+	s= Shanten_ippan(state-kanzen_koritu(state),num_of_furoMentsu=num_of_furoMentsu)
+	shanten_i = min(min_s, s)
+	return min(shanten_i,shanten_k,shanten_t)
+
 
 
 def ukeire(state,num_of_furoMentsu=0):
-    l=[]
-    cur=Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
-    for i in range(S):
-        if state[i]==4:continue
-        state[i]+=1
-        if Shanten(state,num_of_furoMentsu=num_of_furoMentsu)<cur:
-            l.append(i)
-        state[i]-=1
-    return l
+	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	l=[]
+	cur=Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
+	s=set()
+	for i in range(S):
+		if i<27:
+			if i%9==0:
+				if state[i] or state[i+1] or state[i+2]:s.add(i)
+			elif i%9==1:
+				if state[i-1] or state[i] or state[i+1] or state[i+2]:s.add(i)
+			elif i%9==7:
+				if state[i-2] or state[i-1] or state[i] or state[i+1] :s.add(i)
+			elif i%9==8:
+				if state[i-2] or state[i-1] or state[i]:s.add(i)
+			else:
+				if state[i-2] or state[i-1] or state[i] or state[i+1] or state[i+2]:s.add(i)
+		else:
+			if state[i]:s.add(i)
+
+	for i in s:
+		if state[i]==4:continue
+		state[i]+=1
+		if Shanten(state,num_of_furoMentsu=num_of_furoMentsu)<cur:
+			l.append(i)
+		state[i]-=1
+	return l
 
 def can_furo_dic(state,num_of_furoMentsu):
-    def can_pon_set(state):
-        s=set()
-        for i in range(len(state)):
-            if state[i]>1:
-                s.add(i)
-        return s
-    def can_daiminkan_set(state):
-        s=set()
-        for i in range(len(state)):
-            if state[i]>2:
-                s.add(i)
-        return s
-    def can_ron_set(state):
-        s=set()
-        if not Shanten(state,num_of_furoMentsu=num_of_furoMentsu)==0:
-            return s
-        for i in range(S):
-            state[i]+=1
-            if Shanten(state,num_of_furoMentsu=num_of_furoMentsu)==-1:
-                s.add(i)
-            state[i]-=1
-        return s
-    l={}
-    l['pon']=can_pon_set(state)
-    l['daiminkan']=can_daiminkan_set(state)
-    l['ron']=can_ron_set(state)
-    s_chi=set()
-    for i in range(9*3):
-        if can_chi(state,i):
-            s_chi.add(i)
-    l['chi']=s_chi
-    return l
+	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	def can_pon_set(state):
+		s=set()
+		for i in range(len(state)):
+			if state[i]>1:
+				s.add(i)
+		return s
+	def can_daiminkan_set(state):
+		s=set()
+		for i in range(len(state)):
+			if state[i]>2:
+				s.add(i)
+		return s
+	def can_ron_set(state):
+		s=set()
+		if not Shanten(state,num_of_furoMentsu=num_of_furoMentsu)==0:
+			return s
+		for i in range(S):
+			state[i]+=1
+			if Shanten(state,num_of_furoMentsu=num_of_furoMentsu)==-1:
+				s.add(i)
+			state[i]-=1
+		return s
+	l={}
+	l['pon']=can_pon_set(state)
+	l['daiminkan']=can_daiminkan_set(state)
+	l['ron']=can_ron_set(state)
+	s_chi=set()
+	for i in range(9*3):
+		if can_chi(state,i):
+			s_chi.add(i)
+	l['chi']=s_chi
+	return l
     
     
 def can_chi(state,id):
@@ -107,25 +136,41 @@ def can_chi(state,id):
         return  state[id-2]*state[id-1]>0 or state[id-1]*state[id+1]>0 or state[id+1]*state[id+2]>0
 
 #chiできる前提
-def can_chi_list(state,id):
+def can_chi_list(correct_id_state,id):
 	ans=set()
+	state=correct_id_state
 	#字牌は考えない
 	#retrun はソート順
 	if id%9==0:
-		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
+		if state[id+1]*state[id+2]>0:
+			ans.add((id+1,id+2))
 	elif id%9==8:
-		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
+		if state[id-2]*state[id-1]>0:
+			ans.add((id-2,id-1))
 	elif id%9==1:
-		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
-		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
+		if state[id-1]*state[id+1]>0:
+			ans.add((id-1,id+1))
+		if state[id+1]*state[id+2]>0:
+			ans.add((id+1,id+2))
 	elif id%9==7:
-		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
-		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
+		if state[id-2]*state[id-1]>0:
+			ans.add((id-2,id-1))
+		if state[id-1]*state[id+1]>0:
+			ans.add((id-1,id+1))
 	else:
-		if state[id-2]*state[id-1]>0:ans.add((id-2,id-1))
-		if state[id-1]*state[id+1]>0:ans.add((id-1,id+1))
-		if state[id+1]*state[id+2]>0:ans.add((id+1,id+2))
-	return ans
+		if state[id-2]*state[id-1]>0:
+			ans.add((id-2,id-1))
+		if state[id-1]*state[id+1]>0:
+			ans.add((id-1,id+1))
+		if state[id+1]*state[id+2]>0:
+			ans.add((id+1,id+2))
+	more=set()
+	if len(state)==37:
+		for a,b in ans:
+			if a%9==4 and state[34+(a-4)//9]:more.add((34+(a-4)//9,b))
+			if b%9==4 and state[34+(b-4)//9]:more.add((a,34+(b-4)//9))
+	return ans|more
+
 
         
 """
@@ -283,22 +328,40 @@ def Shanten_kokushi(state):
 """
 """
 #####TEST
-
+def state_to_string(state):
+	s_l=['m']
+	for i in range(S):
+		if len(state)==37 and (i==5 or i==14 or i==23):
+			if i==5:k=34
+			elif i==14:k=35
+			else:k=36
+			for j in range(state[k]):
+					s_l.append('5+')
+		if i==9:s_l.append('p')
+		elif i==18:s_l.append('s')
+		elif i==27:s_l.append('z')
+		if state[i]:
+			for j in range(state[i]):
+				s_l.append(str(i))
+	return ''.join(s_l)
 def make_state(string):
-    state=np.zeros(S)
-    sp=0
-    for i in range(len(string)):
-        if string[i]=='m':
-            continue
-        elif string[i]=='p':
-            sp=9
-        elif string[i]=='s':
-            sp=18
-        elif string[i]=='z':
-            sp=27
-        else:
-            state[sp+int(string[i])-1]=state[sp+int(string[i])-1]+1
-    return state
+	state=np.zeros(S)
+	sp=0
+	for i in range(len(string)):
+		if string[i]=='m':
+			continue
+		elif string[i]=='p':
+			sp=9
+		elif string[i]=='s':
+			sp=18
+		elif string[i]=='z':
+			sp=27
+		elif string[i]=='+':
+			state[sp+4]-=1
+			state[34+sp//9]+=1
+		else:
+			state[sp+int(string[i])-1]=state[sp+int(string[i])-1]+1
+	return state
 
 """
 #Shanten_ippanに対して全てのsub_stateでTEST
