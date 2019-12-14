@@ -38,7 +38,7 @@ def vectorize_pai_list(pai_list):
 def Shanten(state,num_of_furoMentsu=0):
 	if len(state)==37:state=corrct_id_state_to_id_state(state)
 	shanten_k,shanten_t=10,10
-	if num_of_furoMentsu>0:
+	if num_of_furoMentsu==0:
 		shanten_t=Shanten_titoi(state)
 		shanten_k=Shanten_kokushi(state)
 	#対子列挙
@@ -277,7 +277,7 @@ def Shanten_titoi(state,four=False):
         if i>=1:
             all_shurui_suu=all_shurui_suu+1
             if i>=2:
-                toitsu_suu=toitsu_suu+i//2
+                toitsu_suu=toitsu_suu+int(i)//2
                 syurui_suu=syurui_suu+1
 
     if four:
@@ -391,3 +391,4 @@ for i in range(15):
 			print(mat)
 		if times%3000==2999:print('times =%d'%times)
 """
+
