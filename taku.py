@@ -15,7 +15,7 @@ class taku:
 		else:
 			self.yama=basic.yama(numOfSet,numOfAkadora,pointOfDoraHyoji)
 		#debug
-		#self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29,31,32,31,32])
+		self.yama.make([27,28,27,28,28,27],tsumo_id_list=[30,31,27,28])
 
 		#カンによるlast_of_yamaの変化はカンの方で
 		if numOfPeople==1:
@@ -41,7 +41,6 @@ class taku:
 		pai=self.yama.kan()
 		self.environment.update_dora()
 		return pai
-
 	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
 				chicha=None,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
 				tenho=False,kaeshi_point=None,uma=None,visual=True,saifu=False,):
@@ -261,17 +260,15 @@ class taku:
 			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_type='ankan' 
 			#self.kan_times+=1
-			self.janshi[self.turn].furo(typ,self.dahai,-1,[])
-			self.environment.update_furo(typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
+			self.environment.update_furo(self.turn,typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
 			self.state='tsumo_turn_start'
 		elif typ=='kakan':
 			self.furo_happen=True#泣かれたひとのid
 			self.furo_id=self.turn
 			self.ed_furo_id=-1#泣かれたひとのid
 			self.furo_type='kakan'
-			self.janshi[self.turn].furo(typ,self.dahai,-1,[])
-			self.environment.update_furo(self.turn,typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
 			self.dahai=result
+			self.environment.update_furo(self.turn,typ,result.correct_id,self.janshi[self.turn].furo_mentsu[-1][-1])
 			#self.kan_times+=1
 			self.state='dahai_check'
 		else:
@@ -285,7 +282,7 @@ class taku:
 		li=[]
 		for i in range(self.numOfPeople):
 			if i==self.turn:continue
-			b,typ,l=self.janshi[i].furo_check(self.dahai,self.can_chi and i==(self.turn+1)%self.numOfPeople,self.environment)
+			b,typ,l=self.janshi[i].furo_check(self.dahai,self.can_chi and i==(self.turn+1)%self.numOfPeople,self.environment,chankan=self.furo_type=='kakan')
 			if b:
 				if typ=='ron':
 					happen_typ='ron'

@@ -110,7 +110,7 @@ class yama:
 				for num in range(1,10):
 					for i in range(4):
 						if num==5 and (not typ=='z') and i<self.numOfAkadora:
-							self.yama.append(pai(typ,num,dora=True))
+							self.yama.append(pai(typ,num,dora=True,aka=True))
 						else :self.yama.append(pai(typ,num))
 					if num==7 and typ=='z':
 						break
@@ -133,19 +133,27 @@ class yama:
 		for i in range(len(self.pointOfDoraHyoji)):
 			self.pointOfDoraHyoji[i]-=1
 		return pai
-	def make(self,forward_id_list,back_id_list=[]):
-		l=[4]*34
-		for i in forward_id_list:
-			l[i]-=1
-		for i in back_id_list:
-			l[i]-=1
-		li=[]
-		for i in range(len(l)):
-			for j in range(l[i]):
-				li.append(i)
-		random.shuffle(li)
-		l=back_id_list+li+forward_id_list
-		self.yama=[pai(0,0,id=i) for i in l]
+	def make(self,forward_id_list,tsumo_id_list=[],back_id_list=[]):
+		f=[]
+		t=[]
+		b=[]
+		for i in forward_id_list[::-1]:
+			for j in range(len(self.yama)):
+				if self.yama[j].id==i:
+					f.append(self.yama.pop(j))
+					break
+		for i in tsumo_id_list[::-1]:
+			for j in range(len(self.yama)):
+				if self.yama[j].id==i:
+					t.append(self.yama.pop(j))
+					break
+		for i in back_id_list[::-1]:
+			for j in range(len(self.yama)):
+				if self.yama[j].id==i:
+					b.append(self.yama.pop(j))
+					break
+		j=max(0,self.numOfPeople*13-len(f))
+		self.yama=b+self.yama[j:]+t+self.yama[:j]+f
 class janshi:
 	def __init__(self,mochiten):
 		self.mochiten=mochiten
@@ -215,16 +223,19 @@ class janshi:
 			self.make_can_furo_dic()
 			return ('dahai',pai)
 		else:
-			tsumo,rt=self.tsumo_check(tsumo_pai)
-			ankan,ra=self.ankan_check(tsumo_pai)
-			kakan,rk=self.kakan_check(tsumo_pai)
+			state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
+			tsumo,rt=self.tsumo_check(tsumo_pai,environment)
+			ankan,ra=self.ankan_check(state,tsumo_pai,environment)
+			kakan,rk=self.kakan_check(state,tsumo_pai,environment)
 			#タクティクス
 			if tsumo:
 				return('tsumo',rt)
 			elif kakan:
-				return('kakan',rk)
+				pai=self.kakan(rk)
+				return('kakan',pai)
 			elif ankan:
-				return('ankan',ra)
+				self.ankan(ra)
+				return('ankan',0)
 			else:
 				rd=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu),tsumo_pai=tsumo_pai)
 				k=0
@@ -261,18 +272,61 @@ class janshi:
 						s,si,uke=a,i,u
 			state[i]+=1
 		return si
-	def kakan_check(self,tusmo_pai):
-		return False,-1
-	def ankan_check(self,tusmo_pai):
-		return False,-1
-	def tsumo_check(self,tusmo_pai):
+	def kakan_check(self,state,tusmo_pai,environment):
+		if environment.kan_times==4 or environment.last_of_yama<2:
+			return False,-1
+		cur_s=tehai_func.Shanten(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu))
+		cur_u=0
+		for k in tehai_func.ukeire(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu)):
+			cur_u+=(4-state[k]-environment.state[k])
+		l=[]
+		for f in self.furo_mentsu:
+			if f[0]=='pon' and state[f[1].id]:
+				l.append(f[1].id)
+		id=-1
+		for i in l:
+			state[i]-=1
+			s=tehai_func.Shanten(state,num_of_furoMentsu=len(self.furo_mentsu))
+			u=0
+			for k in tehai_func.ukeire(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu)):
+				u+=(4-state[k]-environment.state[k])
+			if cur_s>=s and cur_u<=u:
+				cur_s,cur_u,id=s,u,i
+		if id<0:
+			return False,-1
+		else:
+			return True,id
+	def ankan_check(self,state,tusmo_pai,environment):
+		if environment.kan_times==4 or environment.last_of_yama<2:
+			return False,-1
+		cur_s=tehai_func.Shanten(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu))
+		cur_u=0
+		for k in tehai_func.ukeire(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu)):
+			cur_u+=(4-state[k]-environment.state[k])
+		l=[]
+		for i in range(len(state)):
+			if state[i]==4:l.append(i)
+		id=-1
+		for i in l:
+			state[i]-=1
+			s=tehai_func.Shanten(state,num_of_furoMentsu=len(self.furo_mentsu))
+			u=0
+			for k in tehai_func.ukeire(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu)):
+				u+=(4-state[k]-environment.state[k])
+			if cur_s>=s and cur_u<=u:
+				cur_s,cur_u,id=s,u,i
+		if id<0:
+			return False,-1
+		else:
+			return True,id
+	def tsumo_check(self,tusmo_pai,environment):
 		han=4
 		fu=30
 		if tusmo_pai.id in self.can_furo_dic['ron']:
 			return True,(han,fu)
 		else:return False,(han,fu)
 
-	def furo_check(self,dahai,can_chi,environment):
+	def furo_check(self,dahai,can_chi,environment,chankan=False):
 		#(bool,typ,pai,さらしリスト)
 		
 		def ron_check(dahai):
@@ -353,6 +407,8 @@ class janshi:
 			
 
 		def daiminikan_check(dahai,cur_s,cur_u,environment,state):
+			if environment.kan_times==4 or environment.last_of_yama<2:
+				return (False,'daiminkan',10,0,[])
 			if not dahai.id in self.can_furo_dic['daiminkan']:
 				return False,'diminkan',10,0,[]
 			#debug
@@ -378,6 +434,8 @@ class janshi:
 
 		if ron_check(dahai):
 			return (True,'ron',0)
+		elif chankan:
+			return(False,0,0)
 		else:
 			cur_s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu))
 			cur_u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu))
@@ -408,36 +466,39 @@ class janshi:
 			self.furiten=False
 	
 	def furo(self,typ,pai,ed_player_id,l):
-		if typ=='kakan':
-			for i in range(len(self.tehai)):
-				if self.tehai[i].id==pai.id:
-					del self.tehai[i]
-					break
-			self.tehai_state[pai.correct_id]-=1
-			for i in range(len(self.furo_mentsu)):
-				if self.furo_mentsu[i][1].id==pai.id:
-					self.furo_mentsu[i][0]='kakan'
-					self.furo_mentsu[i][3].append(pai)
-					break
-			return
-		elif typ=='ankan':
-			l=[]
-			j=0
-			for i in range(len(self.tehai)):
-				if self.tehai[i-j].id==pai.id:
-					l.append(self.tehai[i-j])
-					self.tehai_state[self.tehai[i-j].correct_id]-=1
-					del self.tehai[i-j]
-					j+=1
-			self.furo_mentsu.append((typ,pai,-1,l))
-		else:
-			l.sort()
-			self.furo_mentsu.append((typ,pai,ed_player_id,[self.tehai[i] for i in l]))
-			j=0
-			for i in l:
+		#'kakan','ankan'はここに来ない
+		l.sort()
+		self.furo_mentsu.append([typ,pai,ed_player_id,[self.tehai[i] for i in l]])
+		j=0
+		for i in l:
+			self.tehai_state[self.tehai[i-j].correct_id]-=1
+			del self.tehai[i-j]
+			j+=1
+	def kakan(self,id):
+		point=0
+		for i in range(len(self.tehai)):
+			if self.tehai[i].id==id:
+				point=i
+				break
+		pai=self.tehai[point]
+		del self.tehai[point]
+		self.tehai_state[pai.correct_id]-=1
+		for i in range(len(self.furo_mentsu)):
+			if self.furo_mentsu[i][1].id==pai.id:
+				self.furo_mentsu[i][0]='kakan'
+				self.furo_mentsu[i][3].append(pai)
+				break
+		return pai
+	def ankan(self,id):
+		l=[]
+		j=0
+		for i in range(len(self.tehai)):
+			if self.tehai[i-j].id==id:
+				l.append(self.tehai[i-j])
 				self.tehai_state[self.tehai[i-j].correct_id]-=1
-				del self.tehai[i-j]
+				pai=self.tehai.pop(i-j)
 				j+=1
+		self.furo_mentsu.append(['ankan',pai,-1,l])
 	def is_tempai(self):
 		l=tehai_func.vectorize_pai_list(self.tehai)
 		if tehai_func.Shanten(l)==0:

@@ -21,7 +21,7 @@ def main():
 	#init
 	#卓の設定
 	numOfPeople=2
-	numOfAkadora=1
+	numOfAkadora=4
 	numOfSet=2
 
 	#視覚用

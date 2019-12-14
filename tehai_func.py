@@ -27,9 +27,9 @@ def corrct_id_state_to_id_state(correct_id_state):
 
 
 def vectorize_pai_list(pai_list):
-    l=[0]*S
+    l=[0]*37
     for p in pai_list:
-        n=p.id
+        n=p.correct_id
         l[n]=l[n]+1
     return l
 """
@@ -38,9 +38,12 @@ def vectorize_pai_list(pai_list):
 def Shanten(state,num_of_furoMentsu=0):
 	if len(state)==37:state=corrct_id_state_to_id_state(state)
 	shanten_k,shanten_t=10,10
+	#debug
+	"""
 	if num_of_furoMentsu==0:
 		shanten_t=Shanten_titoi(state)
 		shanten_k=Shanten_kokushi(state)
+	"""
 	#対子列挙
 	min_s=10
 	for i in range(S):
@@ -342,7 +345,7 @@ def state_to_string(state):
 		elif i==27:s_l.append('z')
 		if state[i]:
 			for j in range(state[i]):
-				s_l.append(str(i))
+				s_l.append(str(i%9+1))
 	return ''.join(s_l)
 def make_state(string):
 	state=np.zeros(S)

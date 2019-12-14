@@ -34,17 +34,23 @@ class environment:
 		self.furo_mentsu=[self.janshi[i].furo_mentsu for i in range(self.numOfPeople)]
 		self.state=np.zeros(self.KIND_OF_PAI_NOMAL)
 		self.last_of_yama=self.taku.last_of_yama
+		self.kan_times=0
 		self.update_dora()
 	def update_dora(self):
-		self.state[self.taku.yama.yama[self.dora_hyoji[-1]].correct_id]+=1
+		self.state[[self.dora_hyoji[-1]]]+=1
 
 	#sutehai_all
 	def update_dahai(self,player_id,dahai_id):
 		self.state[dahai_id]+=1
 		self.all_order.append(('d',player_id,dahai_id))
 	def update_furo(self,player_id,furo_type,furo_ed_pai_id,reveal_pai_list):
-		for p in reveal_pai_list:
-			self.state[p.correct_id]+=1
+		if furo_type=='kakan' or furo_type=='ankan' or furo_type=='daiminkan':
+			self.kan_times+=1
+		if furo_type=='kakan':
+			self.state[furo_ed_pai_id]+=1
+		else:
+			for p in reveal_pai_list:
+				self.state[p.correct_id]+=1
 		self.all_order.append(('f',player_id,furo_type,furo_ed_pai_id,reveal_pai_list))
 	def update_tsumo(self):
 		self.last_of_yama=self.taku.last_of_yama

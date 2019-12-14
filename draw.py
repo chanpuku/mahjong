@@ -1,4 +1,5 @@
 import pygame
+import tehai_func
 class draw_controll:
 	def __init__(self,taku,screen):
 			fo='ipamjm.ttf'
@@ -114,7 +115,7 @@ class draw_controll:
 			if  janshi_id==self.taku.turn and  i==len(tehai)-1 and self.taku.state=='tsumo_action' and not self.taku.furo_type=='pon' and not self.taku.furo_type=='chi':
 				vvx,vvy=vvx+vx/2,vvy+vy/2
 			self.screen.blit(img,(vvx,vvy))
-			if pai.id in self.taku.dora:
+			if pai.correct_id in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
@@ -153,7 +154,7 @@ class draw_controll:
 				img=self.pai_image[pai.correct_id]
 				img=pygame.transform.rotate(img,90*rot_id)
 				self.screen.blit(img,(x,y))
-				if pai.id in self.taku.dora:
+				if pai.correct_id in self.taku.dora:
 					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
 					surface.fill((255,255,0))
 					surface.set_alpha(self.alpha)
@@ -185,15 +186,17 @@ class draw_controll:
 					img=self.pai_image[pai.correct_id]
 					img=pygame.transform.rotate(img,90*janshi_id)
 					self.screen.blit(img,(x,y))
-					if pai.id in self.taku.dora:
+					if pai.correct_id in self.taku.dora:
 						surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 						surface.fill((255,255,0))
 						surface.set_alpha(self.alpha)
 						screen.blit(surface,(x,y))
 				else:
 					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
-					surface.fill((self.back_color_of_pai,0))
+					surface.fill(self.back_color_of_pai)
 					screen.blit(surface,(x,y))
+					w,h=pygame.Surface.get_size(surface)
+					pygame.draw.rect(self.screen, pygame.Color('gray'),(x,y,w,h),1)
 				x+=dx
 				y+=dy
 			return(x,y)
@@ -222,7 +225,7 @@ class draw_controll:
 				img=self.pai_image[pai.correct_id]
 				img=pygame.transform.rotate(img,90*rot_id)
 				self.screen.blit(img,(x,y))
-				if pai.id in self.taku.dora:
+				if pai.correct_id in self.taku.dora:
 					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
 					surface.fill((255,255,0))
 					surface.set_alpha(self.alpha)
@@ -236,7 +239,59 @@ class draw_controll:
 					y+=dy
 			return(x,y)
 		def draw_kakan(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy):
-			return (furox,furoy)
+			def can_direction(i):
+				if i==0:
+					return(0,-29)
+				if i==1:
+					return(-29,0)
+				if i==2:
+					return(0,29)
+				if i==3:
+					return(29,0)
+			_,_,dx,dy,rotx,roty,undox,undoy=furo_point_and_direction(janshi_id)
+			ddx,ddy=can_direction(janshi_id)
+			x,y=furox,furoy
+			if ed_player_id<janshi_id:
+				d=ed_player_id-janshi_id+3
+			else:d=ed_player_id-janshi_id-1
+			k=1
+			for i in range(3):
+				if i==d:
+					x-=dx
+					y-=dy
+					x+=rotx
+					y+=roty
+					rot_id=(janshi_id+1)%4
+					pai=last_pai[2]
+					img=self.pai_image[pai.correct_id]
+					img=pygame.transform.rotate(img,90*rot_id)
+					self.screen.blit(img,(x+ddx,y+ddy))
+					if pai.correct_id in self.taku.dora:
+						surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
+						surface.fill((255,255,0))
+						surface.set_alpha(self.alpha)
+						screen.blit(surface,(x+ddx,y+ddy))
+					pai=furo_ed_pai
+				else:
+					pai=last_pai[k]
+					rot_id=janshi_id
+					k=k-1
+				img=self.pai_image[pai.correct_id]
+				img=pygame.transform.rotate(img,90*rot_id)
+				self.screen.blit(img,(x,y))
+				if pai.correct_id in self.taku.dora:
+					surface=pygame.transform.rotate(pygame.Surface((29,40)),90*rot_id)
+					surface.fill((255,255,0))
+					surface.set_alpha(self.alpha)
+					screen.blit(surface,(x,y))
+				
+				if i==d:
+					x+=undox
+					y+=undoy
+				else:
+					x+=dx
+					y+=dy
+			return(x,y)
 		furox,furoy,_,_,_,_,_,_=furo_point_and_direction(janshi_id)
 		for t in furo_mentsu:
 			kind,furo_ed_pai,ed_player_id,last_pai=t
@@ -279,7 +334,7 @@ class draw_controll:
 			pai=sutehai[i]
 			img=pygame.transform.rotate(self.pai_image[pai.correct_id],90*janshi_id)
 			self.screen.blit(img,(x+vx*(i%6)+vvx*(i//6),y+vy*(i%6)+vvy*(i//6)))
-			if pai.id in self.taku.dora:
+			if pai.correct_id in self.taku.dora:
 				surface=pygame.transform.rotate(pygame.Surface((29,40)),90*janshi_id)
 				surface.fill((255,255,0))
 				surface.set_alpha(self.alpha)
@@ -473,8 +528,8 @@ class draw_controll:
 	def debug(self,x=None):
 		self.screen.fill(pygame.Color('black'),(750,450,200,300))#下300,上400はcontroller
 		l=[]
-		s1='environment'
-		s2=str(self.taku.environment.dora)
+		s1=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[0].tehai)))
+		s2=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[1].tehai)))
 		#s3=str(self.taku.environment.state[27:34])
 		
 		l.append(s1)
