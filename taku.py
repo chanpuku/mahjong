@@ -15,16 +15,16 @@ class taku:
 		else:
 			self.yama=basic.yama(numOfSet,numOfAkadora,pointOfDoraHyoji)
 		#debug
-		self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29,31,32,31,32])
+		#self.yama.make([27,28,27,28,27,28,29,30,29,30,29,30,28,27,30,29,31,32,31,32])
 
-		#カンによるlastOfYamaの変化はカンの方で
+		#カンによるlast_of_yamaの変化はカンの方で
 		if numOfPeople==1:
-			self.lastOfYama=18
+			self.last_of_yama=18
 		else:
 			if torikiri:
-				self.lastOfYama=len(self.yama)-13*numOfPeople-(4+hanahai+2)
+				self.last_of_yama=len(self.yama)-13*numOfPeople-(4+hanahai+2)
 			else:
-				self.lastOfYama=len(self.yama)-13*numOfPeople-14
+				self.last_of_yama=len(self.yama)-13*numOfPeople-14
 		self.dora=self.yama.dora
 	def set_haipai(self,numOfPeople,yama,parent):
 		l=[[] for i in range(numOfPeople)]
@@ -36,8 +36,11 @@ class taku:
 			self.janshi[i].tehai=l[i]
 			self.janshi[i].dora_hyoji=[self.yama.yama[self.yama.dora_hyoji[0]]]
 			self.janshi[i].getting_haipai()
-	def set_new_dora(self):
+	def kan_happen(self):
+		self.kan_times+=1
+		pai=self.yama.kan()
 		self.environment.update_dora()
+		return pai
 
 	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
 				chicha=None,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
@@ -218,15 +221,18 @@ class taku:
 		self.temp_paifu['end']['score']=copy.copy(self.tokuten.tokuten)
 		self.paifu['kyoku'].append(self.temp_paifu)
 	def tsumo_turn_start(self,kan=False):
-		if self.lastOfYama==0:
+		if self.last_of_yama==0:
 			self.ryukyoku=True
 			self.state='kyoku_end'
 		else:
 			kan= self.furo_type =='ankan' or self.furo_type =='kakan' or self.furo_type =='daiminkan'
-			if kan:self.kan_times+=1
 			jan=self.janshi[self.turn]
-			self.tsumo=jan.tsumo(self.yama.yama,kan=kan)
-			self.lastOfYama=self.lastOfYama-1
+			if kan:
+				pai=self.kan_happen()
+				self.tsumo=jan.tsumo(self.yama.yama,pai=pai)
+			else:self.tsumo=jan.tsumo(self.yama.yama)
+			self.last_of_yama=self.last_of_yama-1
+			self.environment.update_tsumo()
 			self.state='tsumo_action'
 	def tsumo_action(self):
 		

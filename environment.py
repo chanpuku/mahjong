@@ -33,6 +33,7 @@ class environment:
 		self.all_order=[]
 		self.furo_mentsu=[self.janshi[i].furo_mentsu for i in range(self.numOfPeople)]
 		self.state=np.zeros(self.KIND_OF_PAI_NOMAL)
+		self.last_of_yama=self.taku.last_of_yama
 		self.update_dora()
 	def update_dora(self):
 		self.state[self.taku.yama.yama[self.dora_hyoji[-1]].correct_id]+=1
@@ -45,5 +46,6 @@ class environment:
 		for p in reveal_pai_list:
 			self.state[p.correct_id]+=1
 		self.all_order.append(('f',player_id,furo_type,furo_ed_pai_id,reveal_pai_list))
-			
+	def update_tsumo(self):
+		self.last_of_yama=self.taku.last_of_yama
 

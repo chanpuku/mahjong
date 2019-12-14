@@ -78,6 +78,7 @@ class yama:
 		self.numOfAkadora=numOfAkadora
 		self.jihai=jihai
 		self.pointOfDoraHyoji=pointOfDoraHyoji
+		self.kan_times=0
 		typ_list=['m','p','s','z']
 		self.yama=[]
 		if self.numOfPeople==4:
@@ -114,8 +115,8 @@ class yama:
 					if num==7 and typ=='z':
 						break
 		random.shuffle(self.yama)
-		self.dora_hyoji=[self.yama[i].id for i in self.pointOfDoraHyoji]
-		self.dora=[self.yama[i].next().id for i in self.pointOfDoraHyoji]
+		self.dora_hyoji=[self.yama[i].correct_id for i in self.pointOfDoraHyoji]
+		self.dora=[self.yama[i].next().correct_id for i in self.pointOfDoraHyoji]
 		if numOfAkadora:
 			self.dora+=[34,35,36]
 
@@ -123,6 +124,15 @@ class yama:
 		return self.yama.pop()
 	def __len__(self):
 		return len(self.yama)
+	def kan(self):
+		self.kan_times+=1
+		self.pointOfDoraHyoji.append(self.pointOfDoraHyoji[-1]+2)
+		self.dora_hyoji.append(self.yama[self.pointOfDoraHyoji[-1]].correct_id)
+		self.dora.append(self.yama[self.pointOfDoraHyoji[-1]].next().correct_id)
+		pai=self.yama.pop(0)
+		for i in range(len(self.pointOfDoraHyoji)):
+			self.pointOfDoraHyoji[i]-=1
+		return pai
 	def make(self,forward_id_list,back_id_list=[]):
 		l=[4]*34
 		for i in forward_id_list:
@@ -181,9 +191,8 @@ class janshi:
 			self.tehai_state[p.correct_id]+=1
 		self.make_can_furo_dic()
 		
-	def tsumo(self,yama,kan=False):
-		if kan:pai=yama.pop(0)
-		else:pai=yama.pop()
+	def tsumo(self,yama,pai=None):
+		if not pai:pai=yama.pop()
 		#なんらかの判定
 		self.tehai.append(pai)
 		self.tehai_state[pai.correct_id]+=1
@@ -240,7 +249,7 @@ class janshi:
 			state[i]-=1
 			a=tehai_func.Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
 			u=0
-			for k in tehai_func.ukeire(state):
+			for k in tehai_func.ukeire(state,num_of_furoMentsu=num_of_furoMentsu):
 				u+=(4-state[k]-environment.state[k])
 			if a<s:
 				s,si,uke=a,i,u

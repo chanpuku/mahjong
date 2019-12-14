@@ -74,7 +74,7 @@ class draw_controll:
 			img=pygame.transform.rotate(img,-90)
 			self.screen.blit(img, point(i))
 		#終了場所
-		last_pai=length-self.taku.lastOfYama
+		last_pai=length-self.taku.last_of_yama
 		x,y=point(last_pai)
 		self.screen.fill((255,0,190),(x,y+29,40,10))
 		#表示牌
@@ -82,7 +82,7 @@ class draw_controll:
 			surface=pygame.transform.rotate(pygame.Surface((29,40)),-90)
 			surface.fill((255,50,255))
 			surface.set_alpha(self.alpha)
-			self.screen.blit(surface,point(i))
+			self.screen.blit(surface,point(i+kan_times))
 		return 1
 	def draw_tehai(self,tehai,janshi_id,furo_mentsu):
 		def tehai_rect(id):
@@ -311,7 +311,7 @@ class draw_controll:
 		self.screen.fill((100,216,255),center_infomation)
 		x,y=270,270
 		#残り枚数
-		text='残り: '+str(taku.lastOfYama)
+		text='残り: '+str(taku.last_of_yama)
 		self.screen.blit(self.font2.render(text, True, (0,0,0)), (x+60,y+45))
 		#卓情報
 		l=['東','南','西','北']
@@ -474,12 +474,12 @@ class draw_controll:
 		self.screen.fill(pygame.Color('black'),(750,450,200,300))#下300,上400はcontroller
 		l=[]
 		s1='environment'
-		s2=str(self.taku.environment.state[18:27])
-		s3=str(self.taku.environment.state[27:34])
+		s2=str(self.taku.environment.dora)
+		#s3=str(self.taku.environment.state[27:34])
 		
 		l.append(s1)
 		l.append(s2)
-		l.append(s3)
+		#l.append(s3)
 		for i in range(len(l)):
 			self.screen.blit(self.font1.render(l[i], True, pygame.Color('white')), (750,500+20*i))
 		
