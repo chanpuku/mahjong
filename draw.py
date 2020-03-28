@@ -134,6 +134,13 @@ class draw_controll:
 				return(10,671,0,-29,0,-40,0,-29)
 		def draw_chi_or_pon(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy):
 			_,_,dx,dy,rotx,roty,undox,undoy=furo_point_and_direction(janshi_id)
+			"""
+			print('draw_chi_or_pon')
+			print('(furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy)')
+			print((furo_ed_pai,ed_player_id,last_pai,janshi_id,screen,furox,furoy))
+			print('_,_,dx,dy,rotx,roty,undox,undoy=furo_point_and_direction(janshi_id)')
+			print((dx,dy,rotx,roty,undox,undoy))
+			"""
 			x,y=furox,furoy
 			if ed_player_id<janshi_id:
 				d=ed_player_id-janshi_id+3
@@ -482,8 +489,8 @@ class draw_controll:
 			else:
 				return (-5,90)
 		x,y=270,270
-		cur_tokuten=self.taku.paifu['kyoku'][-1]['end']['score']
-		pre_tokuten=self.taku.paifu['kyoku'][-1]['info']['score']
+		cur_tokuten=self.taku.paifu.paifu['kyoku'][-1]['kyoku_end']['score']
+		pre_tokuten=self.taku.paifu.paifu['kyoku'][-1]['kyoku_info']['score']
 		for i in range(self.taku.numOfPeople):
 			
 			d=cur_tokuten[i]-pre_tokuten[i]
@@ -528,10 +535,12 @@ class draw_controll:
 	def debug(self,x=None):
 		self.screen.fill(pygame.Color('black'),(750,450,200,300))#下300,上400はcontroller
 		l=[]
-		s1=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[0].tehai)))
-		s2=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[1].tehai)))
+		#s1=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[0].tehai)))
+		#s2=str(tehai_func.state_to_string(tehai_func.vectorize_pai_list(self.taku.janshi[1].tehai)))
 		#s3=str(self.taku.environment.state[27:34])
-		
+		s1=str(self.taku.environment.dora_hyoji)
+		s2=str(self.taku.environment.dora)
+
 		l.append(s1)
 		l.append(s2)
 		#l.append(s3)

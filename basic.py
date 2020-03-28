@@ -87,7 +87,7 @@ class yama:
 					for i in range(4):
 						if num==5 and (not typ=='z') and i<self.numOfAkadora:
 							self.yama.append(pai(typ,num,dora=True,aka=True))
-							self.dora.append(pai(typ,num,aka=True))
+							#self.dora.append(pai(typ,num,aka=True))
 						else :self.yama.append(pai(typ,num))
 					if num==7 and typ=='z':
 						break
@@ -117,7 +117,7 @@ class yama:
 		random.shuffle(self.yama)
 		self.dora_hyoji=[self.yama[i].correct_id for i in self.pointOfDoraHyoji]
 		self.dora=[self.yama[i].next().correct_id for i in self.pointOfDoraHyoji]
-		if numOfAkadora:
+		if self.numOfAkadora:
 			self.dora+=[34,35,36]
 
 	def pop(self):
@@ -154,6 +154,10 @@ class yama:
 					break
 		j=max(0,self.numOfPeople*13-len(f))
 		self.yama=b+self.yama[j:]+t+self.yama[:j]+f
+		self.dora_hyoji=[self.yama[i].correct_id for i in self.pointOfDoraHyoji]
+		self.dora=[self.yama[i].next().correct_id for i in self.pointOfDoraHyoji]
+		if self.numOfAkadora:
+			self.dora+=[34,35,36]
 class janshi:
 	def __init__(self,mochiten):
 		self.mochiten=mochiten
@@ -223,7 +227,7 @@ class janshi:
 			self.make_can_furo_dic()
 			return ('dahai',pai)
 		else:
-			state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
+			state=tehai_func.correct_id_state_to_id_state(self.tehai_state)
 			tsumo,rt=self.tsumo_check(tsumo_pai,environment)
 			ankan,ra=self.ankan_check(state,tsumo_pai,environment)
 			kakan,rk=self.kakan_check(state,tsumo_pai,environment)
@@ -254,7 +258,7 @@ class janshi:
 	def dahai_choice(self,state,environment,num_of_furoMentsu,tsumo_pai=0):
 		#打牌ロジック
 		s,si,uke=10,-1,0
-		state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
+		state=tehai_func.correct_id_state_to_id_state(self.tehai_state)
 		for i in range(len(state)):
 			if state[i]==0:continue
 			state[i]-=1
@@ -367,7 +371,7 @@ class janshi:
 					l=[]
 					j=0
 					for i in range(len(self.tehai)):
-						if self.tehai[i].corrct_id==t[j]:
+						if self.tehai[i].correct_id==t[j]:
 							l.append(i)
 							if j==0:
 								j+=1
@@ -430,7 +434,7 @@ class janshi:
 			if cur_s>=s and cur_u<=u :return(True,'daiminkan',s,u,l)
 			else:return (False,'daiminkan',10,0,[])
 
-		state=tehai_func.corrct_id_state_to_id_state(self.tehai_state)
+		state=tehai_func.correct_id_state_to_id_state(self.tehai_state)
 
 		if ron_check(dahai):
 			return (True,'ron',0)

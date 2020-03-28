@@ -1,0 +1,471 @@
+{
+    "game_info": {
+        "numOfPeople": 2,
+        "numOfAkadora": 4,
+        "numOfSet": 2,
+        "torikiri": true,
+        "hanahai": 0,
+        "numOfKyoku": 2,
+        "numOfTonpu": 2,
+        "tenpai_renchan": true,
+        "daburon": true,
+        "chicha": null,
+        "tobi_end": true,
+        "mochiten": 25000,
+        "tsumibo_point": 300,
+        "zerotobi": false,
+        "oyaken_kamityadori": false
+    },
+    "kyoku": [
+        {
+            "info": {
+                "kyoku": 1,
+                "honba": 0,
+                "kyotaku": 0,
+                "oya": 1,
+                "dora_hyoji": "z7",
+                "haipai": [
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "s2",
+                        "z4",
+                        "z6",
+                        "z5",
+                        "s6",
+                        "s9",
+                        "z4",
+                        "s8",
+                        "s2",
+                        "s9"
+                    ],
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s7",
+                        "s9",
+                        "s5+",
+                        "s1",
+                        "z6",
+                        "s8",
+                        "s5+",
+                        "s6",
+                        "z7",
+                        "s8"
+                    ]
+                ],
+                "score": [
+                    25000,
+                    25000
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": true,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 1,
+                        "hoju_id": -1,
+                        "han": 4,
+                        "fu": 30
+                    }
+                ],
+                "score": [
+                    13000,
+                    37000
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 1,
+                "honba": 1,
+                "kyotaku": 0,
+                "oya": 1,
+                "dora_hyoji": "z5",
+                "haipai": [
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "z5",
+                        "z3",
+                        "s1",
+                        "z5",
+                        "z7",
+                        "s6",
+                        "z6",
+                        "s5+",
+                        "z3",
+                        "s4"
+                    ],
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s8",
+                        "s3",
+                        "s8",
+                        "z7",
+                        "s4",
+                        "z3",
+                        "s9",
+                        "s3",
+                        "s2",
+                        "s5+"
+                    ]
+                ],
+                "score": [
+                    13000,
+                    37000
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": false,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 0,
+                        "hoju_id": -1,
+                        "han": 4,
+                        "fu": 30
+                    }
+                ],
+                "score": [
+                    21300,
+                    28700
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 2,
+                "honba": 0,
+                "kyotaku": 0,
+                "oya": 0,
+                "dora_hyoji": "s2",
+                "haipai": [
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s9",
+                        "s4",
+                        "s7",
+                        "s6",
+                        "s5+",
+                        "s1",
+                        "z6",
+                        "s8",
+                        "s2",
+                        "s1"
+                    ],
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "z7",
+                        "s9",
+                        "z3",
+                        "s4",
+                        "z7",
+                        "z4",
+                        "s2",
+                        "z6",
+                        "s3",
+                        "s3"
+                    ]
+                ],
+                "score": [
+                    21300,
+                    28700
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": true,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 0,
+                        "hoju_id": -1,
+                        "han": 4,
+                        "fu": 30
+                    }
+                ],
+                "score": [
+                    33300,
+                    16700
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 2,
+                "honba": 1,
+                "kyotaku": 0,
+                "oya": 0,
+                "dora_hyoji": "z4",
+                "haipai": [
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "z6",
+                        "s6",
+                        "s5+",
+                        "s3",
+                        "s3",
+                        "s5+",
+                        "s7",
+                        "s8",
+                        "s8",
+                        "s5+"
+                    ],
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "z7",
+                        "s7",
+                        "s8",
+                        "z3",
+                        "z3",
+                        "z5",
+                        "s2",
+                        "s4",
+                        "s2",
+                        "s1"
+                    ]
+                ],
+                "score": [
+                    33300,
+                    16700
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": true,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 0,
+                        "hoju_id": -1,
+                        "han": 4,
+                        "fu": 30
+                    }
+                ],
+                "score": [
+                    45600,
+                    4400
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 2,
+                "honba": 2,
+                "kyotaku": 0,
+                "oya": 0,
+                "dora_hyoji": "s4",
+                "haipai": [
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s9",
+                        "z6",
+                        "z7",
+                        "z3",
+                        "s1",
+                        "s3",
+                        "s6",
+                        "z3",
+                        "s7",
+                        "s3"
+                    ],
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "s6",
+                        "s2",
+                        "s5+",
+                        "s5+",
+                        "s2",
+                        "s1",
+                        "s9",
+                        "s7",
+                        "z7",
+                        "z3"
+                    ]
+                ],
+                "score": [
+                    45600,
+                    4400
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": false,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 1,
+                        "hoju_id": 0,
+                        "han": 4,
+                        "fu": 40
+                    }
+                ],
+                "score": [
+                    37000,
+                    13000
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 3,
+                "honba": 0,
+                "kyotaku": 0,
+                "oya": 1,
+                "dora_hyoji": "z5",
+                "haipai": [
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "z3",
+                        "z5",
+                        "s3",
+                        "z4",
+                        "z6",
+                        "s4",
+                        "s2",
+                        "z4",
+                        "z7",
+                        "s1"
+                    ],
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s9",
+                        "s8",
+                        "s5+",
+                        "s1",
+                        "s6",
+                        "s3",
+                        "s6",
+                        "s9",
+                        "z6",
+                        "s5+"
+                    ]
+                ],
+                "score": [
+                    37000,
+                    13000
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": false,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 0,
+                        "hoju_id": 1,
+                        "han": 4,
+                        "fu": 40
+                    }
+                ],
+                "score": [
+                    45000,
+                    5000
+                ]
+            }
+        },
+        {
+            "info": {
+                "kyoku": 4,
+                "honba": 0,
+                "kyotaku": 0,
+                "oya": 0,
+                "dora_hyoji": "s9",
+                "haipai": [
+                    [
+                        "z1",
+                        "z1",
+                        "z2",
+                        "s3",
+                        "z6",
+                        "z7",
+                        "s7",
+                        "z3",
+                        "s9",
+                        "s3",
+                        "z7",
+                        "s6",
+                        "s2"
+                    ],
+                    [
+                        "z2",
+                        "z2",
+                        "z1",
+                        "s4",
+                        "s4",
+                        "z7",
+                        "z6",
+                        "z3",
+                        "s3",
+                        "s9",
+                        "s1",
+                        "s4",
+                        "s1"
+                    ]
+                ],
+                "score": [
+                    45000,
+                    5000
+                ]
+            },
+            "moda": [],
+            "end": {
+                "renchan": false,
+                "frag": "hora",
+                "hora_list": [
+                    {
+                        "hora_id": 1,
+                        "hoju_id": -1,
+                        "han": 4,
+                        "fu": 30
+                    }
+                ],
+                "score": [
+                    37000,
+                    13000
+                ]
+            }
+        }
+    ],
+    "end_info": {
+        "score": [
+            {
+                "order": 1,
+                "player_id": 0,
+                "score": 37000,
+                "finish_point": 37000
+            },
+            {
+                "order": 2,
+                "player_id": 1,
+                "score": 13000,
+                "finish_point": 13000
+            }
+        ]
+    }
+}

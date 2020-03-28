@@ -6,7 +6,7 @@
         numOfKyoku=None
         numOfTonpu=2,
         mochiten=25000,
-        tenpai_rentyan=True,
+        tenpai_renchan=True,
 		chicha=0,
         daburon=True,
         tobi_end=True,
@@ -25,19 +25,19 @@
                 "tsumibo":
                 "oya":
                 "haipai":[]
-                "dora_hyoji":
+                "dora_hyoji_id":
                 "score":[]
             },
             "moda:[],
             "end:{
-                "frag":  #agari,ryukyoku,ex_ryukyoku
+                "frag":  #agari,ryukyoku,ex_ryukyoku,daburon
                 "renchan": Bool
                 "score":[]
             }
         }
 
     ]
-    "endo_info":{
+    "end_info":{
         score:[]
     }
 

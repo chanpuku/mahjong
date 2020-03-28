@@ -7,7 +7,7 @@ class environment:
 		self.numOfPeople=self.taku.numOfPeople
 		self.numOfSet=self.taku.numOfSet
 		self.mochiten=self.taku.mochiten
-		self.tenpai_rentyan=self.taku.tenpai_rentyan
+		self.tenpai_renchan=self.taku.tenpai_renchan
 		self.daburon=self.taku.daburon
 		self.tobi_end=self.taku.tobi_end
 		self.zerotobi=self.taku.zerotobi

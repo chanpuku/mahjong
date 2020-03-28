@@ -16,7 +16,7 @@ with open('shanten_data/shanten_key', mode='rb') as fi:
 with open('shanten_data/shanten_value', mode='rb') as fi:
     shanten_value = pickle.load(fi)
 
-def corrct_id_state_to_id_state(correct_id_state):
+def correct_id_state_to_id_state(correct_id_state):
 	state=correct_id_state
 	if len(state)==37:
 		ans=np.copy(state[:34])
@@ -36,7 +36,7 @@ def vectorize_pai_list(pai_list):
 シャンテン数
 """
 def Shanten(state,num_of_furoMentsu=0):
-	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	if len(state)==37:state=correct_id_state_to_id_state(state)
 	shanten_k,shanten_t=10,10
 	#debug
 	"""
@@ -61,7 +61,7 @@ def Shanten(state,num_of_furoMentsu=0):
 
 
 def ukeire(state,num_of_furoMentsu=0):
-	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	if len(state)==37:state=correct_id_state_to_id_state(state)
 	l=[]
 	cur=Shanten(state,num_of_furoMentsu=num_of_furoMentsu)
 	s=set()
@@ -89,7 +89,7 @@ def ukeire(state,num_of_furoMentsu=0):
 	return l
 
 def can_furo_dic(state,num_of_furoMentsu):
-	if len(state)==37:state=corrct_id_state_to_id_state(state)
+	if len(state)==37:state=correct_id_state_to_id_state(state)
 	def can_pon_set(state):
 		s=set()
 		for i in range(len(state)):

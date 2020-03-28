@@ -6,6 +6,7 @@ import numpy as np
 import json
 import copy
 import environment
+import paifu_make
 class taku:
 	def set_yama(self,numOfPeople,numOfAkadora,numOfSet,torikiri,hanahai):
 		pointOfDoraHyoji=[5+hanahai]
@@ -41,7 +42,7 @@ class taku:
 		pai=self.yama.kan()
 		self.environment.update_dora()
 		return pai
-	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_rentyan=True,
+	def __init__(self,numOfPeople,numOfAkadora,numOfSet=-1,numOfKyoku=None,numOfTonpu=2,mochiten=25000,tenpai_renchan=True,
 				chicha=None,daburon=True,tobi_end=True,zerotobi=False,torikiri=False,hanahai=0,tsumibo_point=300,oyaken_kamityadori=False,
 				tenho=False,kaeshi_point=None,uma=None,visual=True,saifu=False,):
 		#self.state=[geme_end,kyoku_start,kyoku_end,tsumo_turn_start,action,dahai_check,tsumo_turn_end,finished
@@ -53,7 +54,7 @@ class taku:
 		self.hanahai=hanahai
 		self.numOfKyoku=numOfPeople if numOfKyoku==None else numOfKyoku
 		self.numOfTonpu=numOfTonpu
-		self.tenpai_rentyan=tenpai_rentyan
+		self.tenpai_renchan=tenpai_renchan
 		self.daburon=daburon
 		self.chicha=chicha
 		self.tobi_end=tobi_end
@@ -68,26 +69,7 @@ class taku:
 
 		self.saifu=saifu
 		self.janshi=[basic.janshi(self.mochiten) for i in range(numOfPeople)]
-		#paifu
-		self.json_file=open('paifu/paifu.json' , 'w')
-		self.paifu={'game_info':{},'kyoku':[],'end_info':{}}
-		self.paifu['game_info']['numOfPeople']=self.numOfPeople
-		self.paifu['game_info']['numOfAkadora']=self.numOfAkadora
-		self.paifu['game_info']['numOfSet']=self.numOfSet
-		self.paifu['game_info']['torikiri']=self.torikiri
-		self.paifu['game_info']['hanahai']=self.hanahai
-		self.paifu['game_info']['numOfKyoku']=self.numOfKyoku
-		self.paifu['game_info']['numOfTonpu']=self.numOfTonpu
-		self.paifu['game_info']['tenpai_rentyan']=self.tenpai_rentyan
-		self.paifu['game_info']['daburon']=self.daburon
-		self.paifu['game_info']['chicha']=self.chicha
-		self.paifu['game_info']['tobi_end']=self.tobi_end
-		self.paifu['game_info']['mochiten']=self.mochiten
-		self.paifu['game_info']['tsumibo_point']=self.tsumibo_point
-		self.paifu['game_info']['zerotobi']=self.zerotobi
-		self.paifu['game_info']['oyaken_kamityadori']=self.oyaken_kamityadori
-
-
+	
 		#drawでエラーが出ないために初期化してる、結局するから処理自体はしてもしなくても一緒<-state=game_startの方をなくした
 		
 		#game初め
@@ -105,25 +87,13 @@ class taku:
 		self.parent=self.chicha
 		self.state='kyoku_start'
 		self.environment=environment.environment(self)
-		
+		self.paifu=paifu_make.paifu_make(self.saifu)
+		self.paifu.game_start(self)
 	def game_end(self):
 		if self.kyotaku>0:
 			top=self.tokuten.top()
 			self.tokuten.tokuten[top]=self.tokuten.tokuten[top]+self.kyotaku
-		#paifu
-		t,o=self.tokuten.end_score_correct(self.kaeshi_point,self.uma)
-		l=[]
-		for i in range(self.numOfPeople):
-			d={}
-			j=self.numOfPeople-i-1
-			k=o[j]
-			d['order'],d['player_id'],d['score'],d['finish_point']=i+1,k,self.tokuten.tokuten[k],t[k]
-			l.append(d)
-
-		self.paifu['end_info']['score']=l
-		if self.saifu:
-			json.dump(self.paifu, self.json_file, ensure_ascii=False, indent=4,separators=(',', ': '))
-			#json.dump(self.paifu, self.json_file, ensure_ascii=False, indent=4, sort_keys=True, separators=(',', ': '))
+		self.paifu.game_end(self)
 		self.state='finished'
 	def kyoku_start(self):
 		for i in range(self.numOfPeople):
@@ -147,30 +117,20 @@ class taku:
 		self.dahai=-1
 		self.tsumo=0
 		#paifu
-		self.temp_paifu={'info':{},'moda':[],'end':{}}
-		self.temp_paifu['info']={'kyoku':self.kyoku,'honba':self.honba,'kyotaku':self.kyotaku,'oya':self.parent}
-		self.temp_paifu['info']['dora_hyoji']=self.yama.yama[self.yama.dora_hyoji[0]].name
-		self.temp_paifu['info']['haipai']=[[pai.name for pai in self.janshi[i].tehai] for i in range(self.numOfPeople)]
-		self.temp_paifu['info']['score']=copy.copy(self.tokuten.tokuten)
-		self.temp_paifu['end']['renchan']=True
-
+		self.paifu.kyoku_start(self)
 	def kyoku_end(self):
+		renchan=True
 		if self.ryukyoku:
 			tenpai_bool=[jan.is_tempai() for jan in self.janshi]
 			self.tokuten.ryukyoku(tenpai_bool)
-			rentyan=self.janshi[self.parent].is_tempai() and self.tenpai_rentyan
+			renchan=self.janshi[self.parent].is_tempai() and self.tenpai_renchan
 			self.honba=self.honba+1
-
-			#paifu
-			self.temp_paifu['end']['frag']='ryukyoku'
-			self.temp_paifu['end']['tempai']=[self.janshi[i].is_tempai() for i in range(self.numOfPeople)]
-			if not rentyan:
+			if not renchan:
 				self.kyoku=self.kyoku+1
 				self.parent=(self.parent+1)%self.numOfPeople
-				#paifu
-				self.temp_paifu['end']['renchan']=False
 		else:
 			c=self.numOfPeople*2
+			#kamitya_hora_idの決定
 			for hora_id,hoju_id,_,_ in self.hora_list:
 				if hoju_id==-1:
 					self.kamitya_hora_id=hora_id
@@ -181,7 +141,7 @@ class taku:
 				if c>d:
 					c=d
 					self.kamitya_hora_id=hora_id
-
+			#得点の移動
 			for hora_id,hoju_id,han,fu in self.hora_list:
 				kyotaku,honba=0,0
 				if hora_id==self.kamitya_hora_id:
@@ -190,25 +150,16 @@ class taku:
 					self.tokuten.hora(han,fu,hora_id,self.parent,kyotaku,honba,tsumo=True)
 				else:
 					self.tokuten.hora(han,fu,hora_id,self.parent,kyotaku,honba,hoju_id=hoju_id)
-			rentyan=self.parent==self.kamitya_hora_id
+			renchan=self.parent==self.kamitya_hora_id
 			self.kyotaku=0
-			#paifu
-			self.temp_paifu['end']['frag']='hora'
-			l=[]
-			for t in self.hora_list:
-				dic={}
-				dic['hora_id'],dic['hoju_id'],dic['han'],dic['fu']=t
-				l.append(dic)
-			self.temp_paifu['end']['hora_list']=l
-			if rentyan:
+			if renchan:
 				self.honba=self.honba+1
 			else:
 				self.kyoku=self.kyoku+1
 				self.honba=0
 				self.parent=(self.parent+1)%self.numOfPeople
-				#paifu
-				self.temp_paifu['end']['renchan']=False
-		
+		self.paifu.kyoku_end(self.ryukyoku,renchan,self)
+
 		can_finish=self.kyoku>self.numOfKyoku*self.numOfTonpu
 		if self.tobi_end:
 			can_finish=can_finish or self.tokuten.tobi()
@@ -216,9 +167,6 @@ class taku:
 			self.state='kyoku_start'
 		else:
 			self.state='game_end'
-		#paifu
-		self.temp_paifu['end']['score']=copy.copy(self.tokuten.tokuten)
-		self.paifu['kyoku'].append(self.temp_paifu)
 	def tsumo_turn_start(self,kan=False):
 		if self.last_of_yama==0:
 			self.ryukyoku=True
