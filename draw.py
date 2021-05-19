@@ -14,8 +14,8 @@ class draw_controll:
 			self.font5=pygame.font.Font(fo, 50)
 			tumibo=pygame.transform.smoothscale(pygame.image.load('image/tennbou-100.jpg').convert(),(10,100))
 			self.tumibo=pygame.transform.rotate(tumibo,90)
-			richibo=pygame.transform.smoothscale(pygame.image.load('image/tennbou-1000.jpg').convert(),(10,100))
-			self.richibo=pygame.transform.rotate(richibo,90)
+			reachbo=pygame.transform.smoothscale(pygame.image.load('image/tennbou-1000.jpg').convert(),(10,100))
+			self.reachbo=pygame.transform.rotate(reachbo,90)
 			
 			self.alpha=70
 			screen.fill((0,180,0),(0,0,750,750))# 画面を緑色で塗りつぶす
@@ -385,10 +385,10 @@ class draw_controll:
 		self.screen.blit(tumibo, (x+60,y+100+8+5))
 		self.screen.blit(self.font1_5.render(tumi_info, True, (0,0,0)), (x+120,y+100+8))
 		#供託	
-		richibo=pygame.transform.smoothscale(pygame.Surface.copy(self.richibo),(60,6))
+		reachbo=pygame.transform.smoothscale(pygame.Surface.copy(self.reachbo),(60,6))
 		kyotaku_info=' ×'+str(self.taku.kyotaku)
 		self.screen.blit(self.font1_5.render(kyotaku_info, True, (0,0,0)), (x+120,y+100+8+15))
-		self.screen.blit(richibo, (x+60,y+100+8+15+5))
+		self.screen.blit(reachbo, (x+60,y+100+8+15+5))
 		#ドラ表示
 		vx,vy=x+45-20,y+140
 		pre_x=vx
@@ -414,7 +414,7 @@ class draw_controll:
 				return (35,10)
 			else:
 				return (10,30)
-		def point_richibo(i):
+		def point_reachbo(i):
 			if i==0:
 				return (55,200)
 			elif i==1:
@@ -439,10 +439,10 @@ class draw_controll:
 				surface.set_alpha(self.alpha)
 				self.screen.blit(surface,(x+vx,y+vy))
 			#リーチ棒の表示
-			if taku.janshi[i].richi:
-				vx,vy=point_richibo(i)
-				richibo=pygame.transform.rotate(self.richibo,90*i)
-				self.screen.blit(richibo,(x+vx,y+vy))
+			if taku.janshi[i].reach:
+				vx,vy=point_reachbo(i)
+				reachbo=pygame.transform.rotate(self.reachbo,90*i)
+				self.screen.blit(reachbo,(x+vx,y+vy))
 	def draw_controller(self):
 		#塗り潰し
 		self.screen.fill((255,255,0),(750,50,200,400))#上400,下350はdebug

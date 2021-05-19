@@ -45,6 +45,7 @@ class pai:
 			elif typ=='p':self.correct_id=35
 			elif typ=='s':self.correct_id=36
 		self.tsumogiri=False
+		self.reach_declaration=False
 		self.ed_furo_id=-1
 		self.ed_furo_type=None	
 		self.dora=dora
@@ -158,20 +159,22 @@ class yama:
 		self.dora=[self.yama[i].next().correct_id for i in self.pointOfDoraHyoji]
 		if self.numOfAkadora:
 			self.dora+=[34,35,36]
+
 class janshi:
-	def __init__(self,mochiten):
+	def __init__(self,mochiten,name=None):
 		self.mochiten=mochiten
 		self.tehai=[]
 		self.furo_mentsu=[]#type,furo_ed_pai,ed_player_id,reveal_pai_list
 		self.tehai_state=[]
 		self.sutehai=[]
 		self.tenpai=False
-		self.richi=False
+		self.reach=False
 		self.furiten=False
 		self.can_furo_dic={'pon':set(),'chi':0,'daiminkan':0,'ron':0}
 		self.wind=0
 		self.menzen=True
 		self.player_id=None
+		self.name=name
 	def game_start(self,id):
 		self.plyaer_id=id
 	def kyoku_start(self,wind):
@@ -180,7 +183,44 @@ class janshi:
 		self.dora_hyoji=[]
 		self.sutehai=[]
 		self.tenpai=False
-		self.richi=False
+		self.reach=False
+		self.furiten=False
+		self.can_furo_dic={'pon':set(),'chi':0,'daiminkan':0,'ron':0}
+		self.wind=wind
+		self.menzen=True
+	def is_tempai(self):
+		l=tehai_func.vectorize_pai_list(self.tehai)
+		if tehai_func.Shanten(l)==0:
+			return True
+		else:
+			return False
+		
+
+class nomal_agent(janshi):
+	"""
+	def __init__(self,mochiten):
+		self.mochiten=mochiten
+		self.tehai=[]
+		self.furo_mentsu=[]#type,furo_ed_pai,ed_player_id,reveal_pai_list
+		self.tehai_state=[]
+		self.sutehai=[]
+		self.tenpai=False
+		self.reach=False
+		self.furiten=False
+		self.can_furo_dic={'pon':set(),'chi':0,'daiminkan':0,'ron':0}
+		self.wind=0
+		self.menzen=True
+		self.player_id=None
+	"""
+	def game_start(self,id):
+		self.plyaer_id=id
+	def kyoku_start(self,wind):
+		self.tehai=[]
+		self.furo_mentsu=[]
+		self.dora_hyoji=[]
+		self.sutehai=[]
+		self.tenpai=False
+		self.reach=False
 		self.furiten=False
 		self.can_furo_dic={'pon':set(),'chi':0,'daiminkan':0,'ron':0}
 		self.wind=wind
@@ -276,7 +316,7 @@ class janshi:
 						s,si,uke=a,i,u
 			state[i]+=1
 		return si
-	def kakan_check(self,state,tusmo_pai,environment):
+	def kakan_check(self,state,tsumo_pai,environment):
 		if environment.kan_times==4 or environment.last_of_yama<2:
 			return False,-1
 		cur_s=tehai_func.Shanten(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu))
@@ -300,7 +340,7 @@ class janshi:
 			return False,-1
 		else:
 			return True,id
-	def ankan_check(self,state,tusmo_pai,environment):
+	def ankan_check(self,state,tsumo_pai,environment):
 		if environment.kan_times==4 or environment.last_of_yama<2:
 			return False,-1
 		cur_s=tehai_func.Shanten(self.tehai_state,num_of_furoMentsu=len(self.furo_mentsu))
@@ -323,10 +363,10 @@ class janshi:
 			return False,-1
 		else:
 			return True,id
-	def tsumo_check(self,tusmo_pai,environment):
+	def tsumo_check(self,tsumo_pai,environment):
 		han=4
 		fu=30
-		if tusmo_pai.id in self.can_furo_dic['ron']:
+		if tsumo_pai.id in self.can_furo_dic['ron']:
 			return True,(han,fu)
 		else:return False,(han,fu)
 
@@ -503,10 +543,14 @@ class janshi:
 				pai=self.tehai.pop(i-j)
 				j+=1
 		self.furo_mentsu.append(['ankan',pai,-1,l])
-	def is_tempai(self):
-		l=tehai_func.vectorize_pai_list(self.tehai)
-		if tehai_func.Shanten(l)==0:
-			return True
-		else:
-			return False
+	
+	def nuki(self,id):
+		l=[]
+		for i in range(len(self.tehai)):
+			if self.tehai[i].id==id:
+				l.append(self.tehai[i])
+				self.tehai_state[self.tehai[i].correct_id]-=1
+				pai=self.tehai.pop(i)
+				break
+		self.furo_mentsu.append(['nuki',pai,-1,l])
 	

@@ -65,7 +65,7 @@ class paifu_make:
 		self.temp_paifu['kyoku_end_info']['score']=copy.copy(taku.tokuten.tokuten)
 		self.paifu['kyoku'].append(self.temp_paifu)
 			
-	def tusmo(self):
+	def tsumo(self):
 		if not self.saifu:return
 		pass
 	def dahai(self):

@@ -25,7 +25,7 @@ def main():
 	numOfSet=3
 	numOfTonpu=1
 	#視覚用
-	sleep_time=0
+	sleep_time=0.1
 	sleep_time_kyoku_end=0
 	#import prototype
 	#agent=prototype.agent()

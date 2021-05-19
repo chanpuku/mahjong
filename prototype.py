@@ -10,7 +10,7 @@ class agent (basic.janshi):
 		self.tehai=[]
 		self.sutehai=[]
 		self.tenpai=False
-		self.richi=False
+		self.reach=False
 	def get_haipai(self,yama):
 		self.tehai=yama.yama[-13:]
 		self.tehai.sort()
@@ -57,11 +57,11 @@ class agent (basic.janshi):
 		return pai
 	def hora_dahai(self):
 		return -1
-	def kakan_check(self,tusmo_pai):
+	def kakan_check(self,tsumo_pai):
 		return False,-1
-	def ankan_check(self,tusmo_pai):
+	def ankan_check(self,tsumo_pai):
 		return False,-1
-	def tsumo_check(self,tusmo_pai):
+	def tsumo_check(self,tsumo_pai):
 		han,hu=4,30
 		l=tehai_func.vectorize_pai_list(self.tehai)
 		if tehai_func.Shanten(l)==-1:

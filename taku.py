@@ -68,7 +68,7 @@ class taku:
 		self.can_chi=self.numOfPeople==4
 
 		self.saifu=saifu
-		self.janshi=[basic.janshi(self.mochiten) for i in range(numOfPeople)]
+		self.janshi=[basic.nomal_agent(self.mochiten) for i in range(numOfPeople)]
 	
 		#drawでエラーが出ないために初期化してる、結局するから処理自体はしてもしなくても一緒<-state=game_startの方をなくした
 		
