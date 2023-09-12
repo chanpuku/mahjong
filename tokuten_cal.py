@@ -1,4 +1,5 @@
 import math 
+import mahjong
 class tokuten_cal:
 	def __init__(self,numOfPeople,tenhoSamma,kiriageMangan):
 		self.numOfPeople=numOfPeople

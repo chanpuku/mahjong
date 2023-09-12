@@ -181,6 +181,8 @@ class taku:
 			self.last_of_yama=self.last_of_yama-1
 			self.environment.update_tsumo()
 			self.state='tsumo_action'
+			if self.saifu:
+				self.paifu.tsumo(self.turn,self.tsumo.id)
 	def tsumo_action(self):
 		
 		if self.furo_happen:
@@ -191,38 +193,46 @@ class taku:
 		else:
 			typ,result=self.janshi[self.turn].action(self.environment,tsumo_pai=self.tsumo)
 		self.furo_happen=False
-		self.ed_furo_id=-1#泣かれたひとのid
+		self.ed_furo_id=-1#鳴かれたひとのid
 		self.furo_id=-1#泣いた人のid
 		self.furo_type=None #[tsumo,ron,pon,chi,ankan,kakan,daiminkan]
 		if typ=='tsumo':
-			self.furo_happen=True#泣かれたひとのid
+			self.furo_happen=True
 			self.furo_id=self.turn
-			self.ed_furo_id=-1#泣かれたひとのid
+			self.ed_furo_id=-1#鳴かれたひとのid
 			self.furo_type='tsumo'
 			self.kamitya_hora_id=self.turn
 			self.hora_list.append((self.turn,-1,result[0],result[1]))
 			self.state='kyoku_end'
+			if self.saifu:
+				self.paifu.agari(self.furo_id,'tsumo',self.tsumo.id)
 		elif typ=='ankan':
-			self.furo_happen=True#泣かれたひとのid
+			self.furo_happen=True
 			self.furo_id=self.turn
-			self.ed_furo_id=-1#泣かれたひとのid
+			self.ed_furo_id=-1#鳴かれたひとのid
 			self.furo_type='ankan' 
 			#self.kan_times+=1
 			self.environment.update_furo(self.turn,typ,result,self.janshi[self.turn].furo_mentsu[-1][-1])
 			self.state='tsumo_turn_start'
+			if self.saifu:
+				self.paifu.furo(self.furo_id,self.furo_type,result.id,self.janshi[self.turn].furo_mentsu[-1][-1])
 		elif typ=='kakan':
-			self.furo_happen=True#泣かれたひとのid
+			self.furo_happen=True
 			self.furo_id=self.turn
-			self.ed_furo_id=-1#泣かれたひとのid
+			self.ed_furo_id=-1#鳴かれたひとのid
 			self.furo_type='kakan'
 			self.dahai=result
 			self.environment.update_furo(self.turn,typ,result.correct_id,self.janshi[self.turn].furo_mentsu[-1][-1])
 			#self.kan_times+=1
 			self.state='dahai_check'
+			if self.saifu:
+				self.paifu.furo(self.furo_id,self.furo_type,result.correct_id,self.janshi[self.turn].furo_mentsu[-1][-1])
 		else:
 			self.dahai=result
 			self.environment.update_dahai(self.turn,result.correct_id)
 			self.state='dahai_check'
+			if self.saifu:
+				self.paifu.dahai(self.turn,result.correct_id)
 		
 	def dahai_check(self):
 		happen_typ=''
@@ -251,13 +261,15 @@ class taku:
 					player_id=i 
 					li=l
 		if happen_typ=='ron':
-			self.furo_happen=True#泣かれたひとのid
+			self.furo_happen=True
 			#self.furo_id=player_id
 			self.ed_furo_id=self.turn#泣かれたひとのid
 			self.furo_type='ron' 
 			self.dahai.ed_furo_id=player_id
 			self.dahai.ed_furo_type=happen_typ
 			self.state='kyoku_end'
+			if self.saifu:
+				self.paifu.agari(player_id,self.furo_type,self.dahai.correct_id)
 		elif happen_typ=='':
 			self.state='tsumo_turn_end'
 		else:	
@@ -270,6 +282,8 @@ class taku:
 			self.dahai.ed_furo_type=happen_typ
 			self.environment.update_furo(self.furo_id,happen_typ,self.dahai.correct_id,self.janshi[player_id].furo_mentsu[-1][-1])
 			self.state='tsumo_turn_end'
+			if self.saifu:
+				self.paifu.furo(self.furo_id,happen_typ,self.dahai.correct_id,self.janshi[player_id].furo_mentsu[-1][-1])
 	def tsumo_turn_end(self):
 		if self.furo_type=='pon'or self.furo_type=='chi':
 			self.turn=self.furo_id

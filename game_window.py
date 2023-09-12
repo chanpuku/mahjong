@@ -1,4 +1,4 @@
-
+import traceback
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
 	sleep_time_kyoku_end=0
 	#import prototype
 	#agent=prototype.agent()
-	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=numOfTonpu,numOfSet=numOfSet,torikiri=True,saifu=False)
+	taku=taku.taku(numOfPeople,numOfAkadora,numOfTonpu=numOfTonpu,numOfSet=numOfSet,torikiri=True,saifu=True)
 	draw_controll=draw.draw_controll(taku,screen)
 	pygame.display.update()# 画面を更新
 	state='run'
@@ -83,6 +83,7 @@ def main():
 	#chiのindex エラー用デバッグ
 	except IndexError as e:
 		print(e)
+		print(traceback.format_exc())
 		print(taku.environment.all_order)
 		for i in range(numOfPeople):
 			l=[str(i) for i in taku.janshi[i].tehai]

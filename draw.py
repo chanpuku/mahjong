@@ -489,7 +489,7 @@ class draw_controll:
 			else:
 				return (-5,90)
 		x,y=270,270
-		cur_tokuten=self.taku.paifu.paifu['kyoku'][-1]['kyoku_end']['score']
+		cur_tokuten=self.taku.paifu.paifu['kyoku'][-1]['kyoku_end_info']['score']
 		pre_tokuten=self.taku.paifu.paifu['kyoku'][-1]['kyoku_info']['score']
 		for i in range(self.taku.numOfPeople):
 			

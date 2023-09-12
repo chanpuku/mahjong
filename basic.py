@@ -369,114 +369,110 @@ class nomal_agent(janshi):
 		if tsumo_pai.id in self.can_furo_dic['ron']:
 			return True,(han,fu)
 		else:return False,(han,fu)
+	def ron_check(self,dahai):
+		if self.furiten_check(dahai.id):
+			return False
+		elif dahai.id in self.can_furo_dic['ron']:
+			return True
+		else:
+			return False
+	def chi_check(self,dahai,cur_s,cur_u,environment,state):
+		#(するか,typ,シャンテン数,受け入れ,さらし)
+		if not dahai.id in self.can_furo_dic['chi']:
+			return False,'chi',10,0,[]
+		else:
+			t=None
+			for id1,id2 in tehai_func.can_chi_list(self.tehai_state,dahai.id):
+				self.tehai_state[id1]-=1
+				self.tehai_state[id2]-=1
+				pai_id=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu)+1)
+				self.tehai_state[pai_id]-=1
+				s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu)+1)
+				u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu)+1)
+				u=0
+				self.tehai_state[pai_id]+=1
+				self.tehai_state[id1]+=1
+				self.tehai_state[id2]+=1
+				for i in u_l:
+					u+=(4-self.tehai_state[i]-environment.state[i])
+				if cur_s>s :
+					cur_s,cur_u,t=s,u,(id1,id2)
+				elif cur_s==s:
+					if cur_u<u:
+						cur_s,cur_u,t=s,u,(id1,id2)
+					elif cur_u==u:
+						if id1>33 or id2>33:
+							cur_s,cur_u,t=s,u,(id1,id2)
+				
+			if t:
+				#さらしリストを作る
+				l=[]
+				j=0
+				for i in range(len(self.tehai)):
+					if self.tehai[i].correct_id==t[j]:
+						l.append(i)
+						if j==0:
+							j+=1
+							continue
+						else:break
+				return  True,'chi',s,u,l
+			else:
+				return False,'chi',10,0,[]
+	def pon_check(self,dahai,cur_s,cur_u,environment,state):
+		if not dahai.id in self.can_furo_dic['pon']:
+			return False,'pon',10,0,[]
+		l=[]
+		j=0
+		#さらしリストを作る
+		for i in range(len(self.tehai)):
+			if self.tehai[-(i+1)].id==dahai.id:
+				l.append(len(self.tehai)-(i+1))
+				j+=1
+				if j>1:break
+		l.sort()
+		state[dahai.id]-=2
+		pai_id=self.dahai_choice(state,environment,len(self.furo_mentsu)+1)
+		state[pai_id]-=1
+		s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
+		u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
+		u=0
+		state[pai_id]+=1
+		state[dahai.id]+=2
+		for i in u_l:
+			u+=(4-self.tehai_state[i]-environment.state[i])
+		if cur_s>s or (cur_s==s and cur_u<u ):
+			return(True,'pon',s,u,l)
+		else:return (False,'pon',10,0,[])
+	def daiminikan_check(self,dahai,cur_s,cur_u,environment,state):
+		if environment.kan_times==4 or environment.last_of_yama<2:
+			return (False,'daiminkan',10,0,[])
+		if not dahai.id in self.can_furo_dic['daiminkan']:
+			return False,'diminkan',10,0,[]
+		#debug
+		
+		l=[]
+		j=0
+		for i in range(len(self.tehai)):
+			if self.tehai[i].id==dahai.id:
+				l.append(i)
+				j+=1
+				if j>3:break
+		state[dahai.id]-=3
+		s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
+		u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
+		state[dahai.id]+=3
+		u=0
+		for i in u_l:
+			u+=(4-environment.state[i]-state[i])
+		if cur_s>=s and cur_u<=u :return(True,'daiminkan',s,u,l)
+		else:return (False,'daiminkan',10,0,[])
 
 	def furo_check(self,dahai,can_chi,environment,chankan=False):
 		#(bool,typ,pai,さらしリスト)
-		
-		def ron_check(dahai):
-			if dahai.id in self.can_furo_dic['ron']:
-				return True
-			else:
-				return False	
-		def chi_check(dahai,cur_s,cur_u,environment,state):
-			#(するか,typ,シャンテン数,受け入れ,さらし)
-			if not dahai.id in self.can_furo_dic['chi']:
-				return False,'chi',10,0,[]
-			else:
-				t=None
-				for id1,id2 in tehai_func.can_chi_list(self.tehai_state,dahai.id):
-					self.tehai_state[id1]-=1
-					self.tehai_state[id2]-=1
-					pai_id=self.dahai_choice(self.tehai_state,environment,len(self.furo_mentsu)+1)
-					self.tehai_state[pai_id]-=1
-					s=tehai_func.Shanten(self.tehai_state,len(self.furo_mentsu)+1)
-					u_l=tehai_func.ukeire(self.tehai_state,len(self.furo_mentsu)+1)
-					u=0
-					self.tehai_state[pai_id]+=1
-					self.tehai_state[id1]+=1
-					self.tehai_state[id2]+=1
-					for i in u_l:
-						u+=(4-self.tehai_state[i]-environment.state[i])
-					if cur_s>s :
-						cur_s,cur_u,t=s,u,(id1,id2)
-					elif cur_s==s:
-						if cur_u<u:
-							cur_s,cur_u,t=s,u,(id1,id2)
-						elif cur_u==u:
-							if id1>33 or id2>33:
-								cur_s,cur_u,t=s,u,(id1,id2)
-					
-				if t:
-					#さらしリストを作る
-					l=[]
-					j=0
-					for i in range(len(self.tehai)):
-						if self.tehai[i].correct_id==t[j]:
-							l.append(i)
-							if j==0:
-								j+=1
-								continue
-							else:break
-					return  True,'chi',s,u,l
-				else:
-					return False,'chi',10,0,[]
-					
-			
-			
-		def pon_check(dahai,cur_s,cur_u,environment,state):
-			if not dahai.id in self.can_furo_dic['pon']:
-				return False,'pon',10,0,[]
-			l=[]
-			j=0
-			#さらしリストを作る
-			for i in range(len(self.tehai)):
-				if self.tehai[-(i+1)].id==dahai.id:
-					l.append(len(self.tehai)-(i+1))
-					j+=1
-					if j>1:break
-			l.sort()
-			state[dahai.id]-=2
-			pai_id=self.dahai_choice(state,environment,len(self.furo_mentsu)+1)
-			state[pai_id]-=1
-			s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
-			u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
-			u=0
-			state[pai_id]+=1
-			state[dahai.id]+=2
-			for i in u_l:
-				u+=(4-self.tehai_state[i]-environment.state[i])
-			if cur_s>s or (cur_s==s and cur_u<u ):
-				return(True,'pon',s,u,l)
-			else:return (False,'pon',10,0,[])
-			
-
-		def daiminikan_check(dahai,cur_s,cur_u,environment,state):
-			if environment.kan_times==4 or environment.last_of_yama<2:
-				return (False,'daiminkan',10,0,[])
-			if not dahai.id in self.can_furo_dic['daiminkan']:
-				return False,'diminkan',10,0,[]
-			#debug
-			
-			l=[]
-			j=0
-			for i in range(len(self.tehai)):
-				if self.tehai[i].id==dahai.id:
-					l.append(i)
-					j+=1
-					if j>3:break
-			state[dahai.id]-=3
-			s=tehai_func.Shanten(state,len(self.furo_mentsu)+1)
-			u_l=tehai_func.ukeire(state,len(self.furo_mentsu)+1)
-			state[dahai.id]+=3
-			u=0
-			for i in u_l:
-				u+=(4-environment.state[i]-state[i])
-			if cur_s>=s and cur_u<=u :return(True,'daiminkan',s,u,l)
-			else:return (False,'daiminkan',10,0,[])
 
 		state=tehai_func.correct_id_state_to_id_state(self.tehai_state)
 
-		if ron_check(dahai):
+		if self.ron_check(dahai):
 			return (True,'ron',0)
 		elif chankan:
 			return(False,0,0)
@@ -486,8 +482,8 @@ class nomal_agent(janshi):
 			cur_u=0
 			for i in cur_u_l:
 				cur_u+=(4-environment.state[i]-state[i])
-			if can_chi:f_l=[daiminikan_check,pon_check,chi_check]
-			else:f_l=[daiminikan_check,pon_check]
+			if can_chi:f_l=[self.daiminikan_check,self.pon_check,self.chi_check]
+			else:f_l=[self.daiminikan_check,self.pon_check]
 			boo,typ,shan,uke,li=False,0,10,0,[]
 			#Trueの中で最もいいやつを使う
 			for f in f_l:
@@ -496,7 +492,8 @@ class nomal_agent(janshi):
 					if shan>s or (shan==s and uke<u):
 						boo,typ,shan,uke,li=b,t,s,u,l
 			return (boo,typ,li)
-
+	def furiten_check(self,pai_id):
+		return pai_id in [pai.id for pai in self.sutehai]
 	def make_can_furo_dic(self):
 		self.can_furo_dic=tehai_func.can_furo_dic(self.tehai_state,len(self.furo_mentsu))
 		furi=set()

@@ -65,15 +65,20 @@ class paifu_make:
 		self.temp_paifu['kyoku_end_info']['score']=copy.copy(taku.tokuten.tokuten)
 		self.paifu['kyoku'].append(self.temp_paifu)
 			
-	def tsumo(self):
+	def tsumo(self,player_id,pai_id):
 		if not self.saifu:return
-		pass
-	def dahai(self):
+		dic={'player_id':player_id,'type':'tusmo','pai_id':pai_id}
+		self.temp_paifu['moda'].append(dic)
+	def dahai(self,player_id,pai_id):
 		if not self.saifu:return
-		pass
-	def naki(self):
+		dic={'player_id':player_id,'type':'dahai','pai_id':pai_id}
+		self.temp_paifu['moda'].append(dic)
+	def furo(self,player_id,furo_type,furo_ed_pai_id,reveal_pai_list):
 		if not self.saifu:return
-		pass
-	def agari(self):
+		reveal_pai_list=[pai.correct_id for pai in reveal_pai_list]
+		dic={'player_id':player_id,'type':furo_type,'furo_ed_pai_id':furo_ed_pai_id,'reveal_pai_list':reveal_pai_list}
+		self.temp_paifu['moda'].append(dic)
+	def agari(self,player_id,agari_type,pai_id):
 		if not self.saifu:return
-		pass
+		dic={'player_id':player_id,'type':'agari','agari_type':agari_type,'pai_id':pai_id}
+		self.temp_paifu['moda'].append(dic)

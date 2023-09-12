@@ -8,7 +8,7 @@ import os
 import random
 
 
-rule='4nan'
+#rule='4nan'
 rule='3nan'
 
 
@@ -25,6 +25,7 @@ folder=folder+'/'+rule+'/'+'2019'
 file_list=os.listdir(folder)
 file_name=random.choice(file_list)
 #file_name='20200101__0.json'
+file_name='20190101__0.json'
 #file_name='scc20090220__207.json'
 file=open(folder+'/'+file_name)
 data=json.load(file)
